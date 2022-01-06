@@ -17,36 +17,41 @@ class _PhotoState extends State<PhotoPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        iconTheme: IconThemeData(
+          color: Colors.black,
+        ),
         title: Text(
           "사진",
           style: TextStyle(color: Colors.black, fontSize: 17, fontWeight: FontWeight.w700)),
         backgroundColor: Colors.white,
         elevation: 0,
       ),
-      body: StreamBuilder<QuerySnapshot>(
-      stream: _photoStream,
-      builder: 
-        (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (snapshot.hasError) {
-            return Text('Error Ocurred');
-          }
+      body: 
+        StreamBuilder<QuerySnapshot>(
+        stream: _photoStream,
+        builder: 
+          (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            if (snapshot.hasError) {
+              return Text('Error Ocurred');
+            }
 
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Text("Loading ...");
-          }
-        
-          return ListView(
-            children: snapshot.data!.docs.map((DocumentSnapshot document) {
-              Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
-              return ListTile(
-                title: Text(data['title']),
-                subtitle: Text(data['link']),
-              );
-            }).toList(),
-          );
-        },
-      ),
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Text("Loading ...");
+            }
+          
+            return ListView(
+              children: snapshot.data!.docs.map((DocumentSnapshot document) {
+                Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
+                return ListTile(
+                  title: Text(data['title']),
+                  subtitle: Text(data['link']),
+                );
+              }).toList(),
+            );
+          },
+        ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.lightBlueAccent,
         onPressed: () {
           Navigator.push(
             context, 
@@ -54,6 +59,37 @@ class _PhotoState extends State<PhotoPage> {
           );
         },
         child: const Icon(Icons.add),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            const DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.lightBlueAccent,
+              ),
+              child: Text('XXX님'),
+            ),
+            ListTile(
+              title: const Text('로그아웃'),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: const Text('알림설정'),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: const Text('학생정보관리'),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
