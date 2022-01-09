@@ -3,6 +3,8 @@ import 'package:flutter/widgets.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:scoop/page_view.dart';
+import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PhotoPage extends StatefulWidget {
   @override
@@ -44,8 +46,11 @@ class _PhotoState extends State<PhotoPage> {
               children: snapshot.data!.docs.map((DocumentSnapshot document) {
                 Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
                 return ListTile(
-                  title: Text(data['title']),
-                  subtitle: Text(data['link']),
+                  title: InkWell(
+                    child: Text(data['title']),
+                    onTap: () => launch(data['link']),
+                  ),
+                  subtitle: Text(data['date']),
                   trailing: IconButton(
                     icon: const Icon(Icons.delete),
                     onPressed: () async {
@@ -115,7 +120,7 @@ class _PhotoAddState extends State<PhotoAddScreen>{
 
   String title = '';
   String link = '';
-  var date = DateTime.now();
+  String date = DateFormat.yMd().format(DateTime.now()).toString();
 
   CollectionReference photo = FirebaseFirestore.instance.collection('photo');
 
