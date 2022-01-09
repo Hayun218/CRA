@@ -11,13 +11,14 @@ class PhotoPage extends StatefulWidget {
 
 class _PhotoState extends State<PhotoPage> {
   final Stream<QuerySnapshot> _photoStream = FirebaseFirestore.instance.collection('photo').snapshots();
+  CollectionReference photo = FirebaseFirestore.instance.collection('photo');
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        iconTheme: IconThemeData(
+        iconTheme: const IconThemeData(
           color: Colors.black,
         ),
         title: Text(
@@ -32,11 +33,11 @@ class _PhotoState extends State<PhotoPage> {
         builder: 
           (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.hasError) {
-              return Text('Error Ocurred');
+              return const Text('Error Ocurred');
             }
 
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Text("Loading ...");
+              return const Text("Loading ...");
             }
           
             return ListView(
@@ -45,6 +46,15 @@ class _PhotoState extends State<PhotoPage> {
                 return ListTile(
                   title: Text(data['title']),
                   subtitle: Text(data['link']),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete),
+                    onPressed: () async {
+                      await photo
+                            .doc(document.id).delete()
+                            .then((value) => print("삭제되었습니다"))
+                            .catchError((error) => print("문제가 발생했습니다"));
+                    },
+                  ),
                 );
               }).toList(),
             );
@@ -55,7 +65,7 @@ class _PhotoState extends State<PhotoPage> {
         onPressed: () {
           Navigator.push(
             context, 
-            MaterialPageRoute(builder: (context) => PhotoAdd()),
+            MaterialPageRoute(builder: (context) => PhotoAddScreen()),
           );
         },
         child: const Icon(Icons.add),
@@ -95,7 +105,29 @@ class _PhotoState extends State<PhotoPage> {
   }
 }
 
-class PhotoAdd extends StatelessWidget{
+class PhotoAddScreen extends StatefulWidget {
+  @override
+  _PhotoAddState createState() => _PhotoAddState();
+}
+
+class _PhotoAddState extends State<PhotoAddScreen>{
+  final formKey = GlobalKey<FormState>();
+
+  String title = '';
+  String link = '';
+  var date = DateTime.now();
+
+  CollectionReference photo = FirebaseFirestore.instance.collection('photo');
+
+  Future<void> addPhoto() {
+    return photo.add({
+      'title': title,
+      'link': link,
+      'date': date,
+    }).then((value) => print("업로드 성공"))
+    .catchError((error) => print("문제가 발생했습니다: $error"));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -110,7 +142,87 @@ class PhotoAdd extends StatelessWidget{
         backgroundColor: Colors.white,
         elevation: 0,
       ),
-      body: Form(child: TextField()),
+      body: Form(
+        key: formKey,
+        child: Column(
+          children: [
+            renderTextFormField(
+              label: '제목', 
+              onSaved: (val) {
+                setState(() {
+                  title = val;
+                });
+              }, 
+              validator: (val) {
+                if (val.length < 1) {
+                  return '제목을 입력해주세요';
+                }
+
+                return null;
+              },
+            ),
+            renderTextFormField(
+              label: '링크', 
+              onSaved: (val) {
+                setState(() {
+                  link = val;
+                });
+              }, 
+              validator: (val) {
+                if (val.length < 1) {
+                  return '링크를 입력해주세요';
+                }
+
+                return null;
+              },
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                if (formKey.currentState!.validate()) {
+                  formKey.currentState!.save();
+                  addPhoto();
+                  Navigator.pop(context);
+                }
+              },
+              style: ButtonStyle(backgroundColor: MaterialStateProperty.all<Color>(Colors.lightBlueAccent)),
+              child: Text(
+                '업로드',
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
+
+renderTextFormField({
+    required String label,
+    required FormFieldSetter onSaved,
+    required FormFieldValidator validator,
+  }) {
+
+    return Column(
+      children: [
+        Row(
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12.0,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
+        TextFormField(
+          onSaved: onSaved,
+          validator: validator,
+        ),
+        Container(height: 16.0),
+      ],
+    );
+  }
