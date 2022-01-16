@@ -4,9 +4,12 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:scoop/page_view.dart';
 import 'package:intl/intl.dart';
+import 'package:scoop/student_info.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class PhotoPage extends StatefulWidget {
+  const PhotoPage({Key? key}) : super(key: key);
+
   @override
   _PhotoState createState() => _PhotoState();
 }
@@ -23,7 +26,7 @@ class _PhotoState extends State<PhotoPage> {
         iconTheme: const IconThemeData(
           color: Colors.black,
         ),
-        title: Text(
+        title: const Text(
           "사진",
           style: TextStyle(color: Colors.black, fontSize: 17, fontWeight: FontWeight.w700)),
         backgroundColor: Colors.white,
@@ -53,6 +56,7 @@ class _PhotoState extends State<PhotoPage> {
                   subtitle: Text(data['date']),
                   trailing: IconButton(
                     icon: const Icon(Icons.delete),
+                    color: Colors.black,
                     onPressed: () async {
                       await photo
                             .doc(document.id).delete()
@@ -70,7 +74,7 @@ class _PhotoState extends State<PhotoPage> {
         onPressed: () {
           Navigator.push(
             context, 
-            MaterialPageRoute(builder: (context) => PhotoAddScreen()),
+            MaterialPageRoute(builder: (context) => const PhotoAddScreen()),
           );
         },
         child: const Icon(Icons.add),
@@ -100,7 +104,10 @@ class _PhotoState extends State<PhotoPage> {
             ListTile(
               title: const Text('학생정보관리'),
               onTap: () {
-                Navigator.pop(context);
+                Navigator.push(
+                  context, 
+                  MaterialPageRoute(builder: (context) => StudentInfoPage()),
+                );
               },
             ),
           ],
@@ -111,6 +118,8 @@ class _PhotoState extends State<PhotoPage> {
 }
 
 class PhotoAddScreen extends StatefulWidget {
+  const PhotoAddScreen({Key? key}) : super(key: key);
+
   @override
   _PhotoAddState createState() => _PhotoAddState();
 }
@@ -138,10 +147,10 @@ class _PhotoAddState extends State<PhotoAddScreen>{
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        iconTheme: IconThemeData(
+        iconTheme: const IconThemeData(
           color: Colors.black,
         ),
-        title: Text(
+        title: const Text(
           "사진 추가",
           style: TextStyle(color: Colors.black, fontSize: 17, fontWeight: FontWeight.w700)),
         backgroundColor: Colors.white,
@@ -190,7 +199,7 @@ class _PhotoAddState extends State<PhotoAddScreen>{
                 }
               },
               style: ButtonStyle(backgroundColor: MaterialStateProperty.all<Color>(Colors.lightBlueAccent)),
-              child: Text(
+              child: const Text(
                 '업로드',
                 style: TextStyle(
                   color: Colors.white,
@@ -216,7 +225,7 @@ renderTextFormField({
           children: [
             Text(
               label,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w700,
               ),
