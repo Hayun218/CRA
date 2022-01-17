@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:date_format/date_format.dart';
 
+import 'grade.dart';
+
 class StudentPage extends StatefulWidget {
   @override
   _StudentPageState createState() => _StudentPageState();
@@ -102,6 +104,19 @@ getRecordLink(String stuUID) async {
 updateRecordURL(String stuUID, TextEditingController record) async {
   var stuDoc = FirebaseFirestore.instance.collection('HILS').doc(stuUID);
   return stuDoc.set({"record": record.text}, SetOptions(merge: true));
+}
+
+warning(context) {
+  showDialog(
+      context: context,
+      builder: (context) {
+        return const AlertDialog(
+          content: Text(
+            "Select a Student first",
+            style: TextStyle(color: Colors.blueAccent),
+          ),
+        );
+      });
 }
 
 class _StudentPageState extends State<StudentPage> {
@@ -211,54 +226,58 @@ class _TeacherState extends State<Teacher> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  showDialog(
-                      context: context,
-                      barrierDismissible: true,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: Center(
-                            child: Text(
-                              "생활기록부",
-                            ),
-                          ),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0)),
-                          content: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              TextField(
-                                maxLines: null,
-                                controller: _studentRecordURL,
-                                decoration: const InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  hintText: 'Enter URL',
-                                ),
+                  if (_selectedUid == "initial UID") {
+                    warning(context);
+                  } else {
+                    showDialog(
+                        context: context,
+                        barrierDismissible: true,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Center(
+                              child: Text(
+                                "생활기록부",
                               ),
-                              Row(
-                                children: [
-                                  TextButton(
-                                      onPressed: () => updateRecordURL(
-                                          _selectedUid, _studentRecordURL),
-                                      child: Text("save")),
-                                  TextButton(
-                                      onPressed: () {
-                                        _studentRecordURL.clear();
-                                        updateRecordURL(
-                                            _selectedUid, _studentRecordURL);
-                                      },
-                                      child: Text("delete")),
-                                  TextButton(
-                                      onPressed: () {
-                                        _launchURL(_studentRecordURL.text);
-                                      },
-                                      child: Text("보기")),
-                                ],
-                              )
-                            ],
-                          ),
-                        );
-                      });
+                            ),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0)),
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                TextField(
+                                  maxLines: null,
+                                  controller: _studentRecordURL,
+                                  decoration: const InputDecoration(
+                                    border: OutlineInputBorder(),
+                                    hintText: 'Enter URL',
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    TextButton(
+                                        onPressed: () => updateRecordURL(
+                                            _selectedUid, _studentRecordURL),
+                                        child: Text("save")),
+                                    TextButton(
+                                        onPressed: () {
+                                          _studentRecordURL.clear();
+                                          updateRecordURL(
+                                              _selectedUid, _studentRecordURL);
+                                        },
+                                        child: Text("delete")),
+                                    TextButton(
+                                        onPressed: () {
+                                          _launchURL(_studentRecordURL.text);
+                                        },
+                                        child: Text("보기")),
+                                  ],
+                                )
+                              ],
+                            ),
+                          );
+                        });
+                  }
                 },
                 child: const Text('생활기록부'),
                 style: ElevatedButton.styleFrom(
@@ -280,7 +299,19 @@ class _TeacherState extends State<Teacher> {
                 ),
               ),
               ElevatedButton(
-                onPressed: () => null,
+                onPressed: () {
+                  if (_selectedUid == "initial UID") {
+                    warning(context);
+                  } else {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            StudentGrades(stuUID: _selectedUid),
+                      ),
+                    );
+                  }
+                },
                 child: Text('모의고사 성적'),
                 style: ElevatedButton.styleFrom(
                   primary: Colors.transparent,
