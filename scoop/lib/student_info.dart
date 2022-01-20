@@ -9,8 +9,7 @@ class StudentInfoPage extends StatefulWidget {
 }
 
 class _StudentInfoState extends State<StudentInfoPage> {
-  final Stream<DocumentSnapshot> _studentStream = FirebaseFirestore.instance.collection('HILS').doc('student_DB').snapshots();
-  CollectionReference student = FirebaseFirestore.instance.collection('student');
+  CollectionReference studentInfo = FirebaseFirestore.instance.collection('HILS');
 
   @override
   Widget build(BuildContext context) {
@@ -27,10 +26,10 @@ class _StudentInfoState extends State<StudentInfoPage> {
         elevation: 0,
       ),
       body: 
-      StreamBuilder<DocumentSnapshot>(
-        stream: _studentStream,
+        StreamBuilder<QuerySnapshot>(
+        stream: studentInfo.where('status', isEqualTo: 0).snapshots(),
         builder: 
-          (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+          (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.hasError) {
               return const Text('Error Ocurred');
             }
@@ -38,20 +37,32 @@ class _StudentInfoState extends State<StudentInfoPage> {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Text("Loading ...");
             }
-
-            var doc = snapshot.data;
-            return Text(doc!["student"][1]["name"]);
-          }
+          
+            return ListView(
+              children: snapshot.data!.docs.map((DocumentSnapshot document) {
+                Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
+                return Text.rich(
+                  TextSpan(
+                    text: data['name'],
+                    children: <TextSpan>[
+                      TextSpan(text: ' | '+data['birth']),
+                      TextSpan(text: ' | '+data['coach']),
+                    ]
+                  ),
+                );
+              }).toList(),
+            );
+          },
         ),
-        floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.lightBlueAccent,
-        onPressed: () {
-          Navigator.push(
-            context, 
-            MaterialPageRoute(builder: (context) => const StudentAddScreen()),
-          );
-        },
-        child: const Icon(Icons.add),
+      floatingActionButton: FloatingActionButton(
+      backgroundColor: Colors.lightBlueAccent,
+      onPressed: () {
+        Navigator.push(
+          context, 
+          MaterialPageRoute(builder: (context) => const StudentAddScreen()),
+        );
+      },
+      child: const Icon(Icons.add),
       ),
     );
   }
@@ -66,23 +77,21 @@ class StudentAddScreen extends StatefulWidget {
 
 class _StudentAddState extends State<StudentAddScreen>{
   final formKey = GlobalKey<FormState>();
+  CollectionReference studentInfo = FirebaseFirestore.instance.collection('HILS');
 
-  String name = '';
-  String birthdate = '';
-  String teacher = '';
-
-  DocumentReference student = FirebaseFirestore.instance.collection('HILS').doc('student_DB');
-
-  Future<void> addStudent() {
-    var map = new Map<String, dynamic>();
-    map['name'] = name;
-    map['birthdate'] = birthdate;
-    map['teacher'] = teacher;
-    return student.set({
-      "student": FieldValue.arrayUnion([map])
-    }, SetOptions(merge: true)).then((value) => print("업로드 성공"))
+  Future<void> addStudent() async {
+    return studentInfo.add({
+      'name': name,
+      'birth': birth,
+      'coach': coach,
+      'status': 0,
+    }).then((value) => print("업로드 성공"))
     .catchError((error) => print("문제가 발생했습니다: $error"));
   }
+
+  String name = '';
+  String birth = '';
+  String coach = '';
 
   @override
   Widget build(BuildContext context) {
@@ -121,7 +130,7 @@ class _StudentAddState extends State<StudentAddScreen>{
               label: '생년월일 (YY/MM/DD)', 
               onSaved: (val) {
                 setState(() {
-                  birthdate = val;
+                  birth = val;
                 });
               }, 
               validator: (val) {
@@ -137,7 +146,7 @@ class _StudentAddState extends State<StudentAddScreen>{
               label: '담당 선생님 이름', 
               onSaved: (val) {
                 setState(() {
-                  teacher = val;
+                  coach = val;
                 });
               }, 
               validator: (val) {

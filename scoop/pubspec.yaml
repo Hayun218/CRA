@@ -45,6 +45,7 @@ dependencies:
   url_launcher: ^6.0.17
   table_calendar: ^3.0.3
   date_format: ^2.0.5
+  firebase_database: ^9.0.5
 
 
 dev_dependencies:
