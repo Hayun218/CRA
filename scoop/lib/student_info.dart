@@ -41,15 +41,40 @@ class _StudentInfoState extends State<StudentInfoPage> {
             return ListView(
               children: snapshot.data!.docs.map((DocumentSnapshot document) {
                 Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
-                return Text.rich(
-                  TextSpan(
-                    text: data['name'],
-                    children: <TextSpan>[
-                      TextSpan(text: ' | '+data['birth']),
-                      TextSpan(text: ' | '+data['coach']),
-                    ]
-                  ),
-                );
+                return 
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      listBox(text: data['name']),
+                      listBox(text: data['birth']),
+                      listBox(text: data['coach']),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.edit),
+                            color: Colors.black,
+                            onPressed: () async {
+                              await studentInfo
+                              .doc(document.id).delete()
+                              .then((value) => print("삭제되었습니다"))
+                              .catchError((error) => print("문제가 발생했습니다"));
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete),
+                            color: Colors.black,
+                            onPressed: () async {
+                              await studentInfo
+                              .doc(document.id).delete()
+                              .then((value) => print("삭제되었습니다"))
+                              .catchError((error) => print("문제가 발생했습니다"));
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  );
               }).toList(),
             );
           },
@@ -207,3 +232,17 @@ renderTextFormField({
       ],
     );
   }
+
+listBox ({
+  required String text,
+}) {
+  return Container(
+    margin: const EdgeInsets.all(0.0),
+    padding: const EdgeInsets.all(3.0),
+    decoration: 
+      BoxDecoration(
+        border: Border.all(width: 1.0, color: Colors.black),
+      ),
+    child: Text(text),
+  );
+}
