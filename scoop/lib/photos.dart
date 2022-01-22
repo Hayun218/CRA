@@ -12,7 +12,6 @@ class PhotoPage extends StatefulWidget {
 }
 
 class _PhotoState extends State<PhotoPage> {
-  final Stream<QuerySnapshot> _photoStream = FirebaseFirestore.instance.collection('photo').snapshots();
   CollectionReference photo = FirebaseFirestore.instance.collection('photo');
 
   @override
@@ -31,7 +30,7 @@ class _PhotoState extends State<PhotoPage> {
       ),
       body: 
         StreamBuilder<QuerySnapshot>(
-        stream: _photoStream,
+        stream: photo.orderBy('date').snapshots(),
         builder: 
           (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.hasError) {
