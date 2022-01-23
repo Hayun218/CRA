@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:scoop/screens/Drawer.dart';
 import 'package:scoop/student_info.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'event.dart';
@@ -158,40 +159,7 @@ class _DashboardState extends State<DashboardPage> {
         ),
       child: const Icon(Icons.add),
       ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.lightBlueAccent,
-              ),
-              child: Text('XXX님'),
-            ),
-            ListTile(
-              title: const Text('로그아웃'),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: const Text('알림설정'),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: const Text('학생정보관리'),
-              onTap: () {
-                Navigator.push(
-                  context, 
-                  MaterialPageRoute(builder: (context) => const StudentInfoPage()),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
+      drawer: defaultDrawer(context: context),
     );
   }
 }

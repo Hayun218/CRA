@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
-import 'package:scoop/student_info.dart';
+import 'package:scoop/screens/Drawer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class PhotoPage extends StatefulWidget {
@@ -75,40 +75,7 @@ class _PhotoState extends State<PhotoPage> {
         },
         child: const Icon(Icons.add),
       ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.lightBlueAccent,
-              ),
-              child: Text('XXX님'),
-            ),
-            ListTile(
-              title: const Text('로그아웃'),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: const Text('알림설정'),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: const Text('학생정보관리'),
-              onTap: () {
-                Navigator.push(
-                  context, 
-                  MaterialPageRoute(builder: (context) => StudentInfoPage()),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
+      drawer: defaultDrawer(context: context),
     );
   }
 }

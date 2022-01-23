@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:scoop/screens/StudentAddScreen.dart';
+import 'package:scoop/screens/StudentEditScreen.dart';
 
 
 class StudentInfoPage extends StatefulWidget {
@@ -68,6 +69,7 @@ class _StudentInfoState extends State<StudentInfoPage> {
                 Expanded(child: ListView(
                   children: snapshot.data!.docs.map((DocumentSnapshot document) {
                     Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
+                    var id = document.id;
                     return 
                       Row(
                         mainAxisSize: MainAxisSize.min,
@@ -81,12 +83,17 @@ class _StudentInfoState extends State<StudentInfoPage> {
                               IconButton(
                                 icon: const Icon(Icons.edit),
                                 color: Colors.black,
-                                onPressed: () async {
-                                  await studentInfo
-                                  .doc(document.id).delete()
-                                  .then((value) => print("삭제되었습니다"))
-                                  .catchError((error) => print("문제가 발생했습니다"));
-                                },
+                                onPressed: () {
+                                  Navigator.push(
+                                    context, 
+                                    MaterialPageRoute(builder: (context) => StudentEditScreen(
+                                      initialName: data['name'],
+                                      initialBirth: data['birth'],
+                                      initialCoach: data['coach'],
+                                      docId: id,
+                                    )),
+                                  );
+                                }
                               ),
                               IconButton(
                                 icon: const Icon(Icons.delete),
