@@ -14,6 +14,14 @@ class StudentInfoPage extends StatefulWidget {
 class _StudentInfoState extends State<StudentInfoPage> {
   CollectionReference studentInfo = FirebaseFirestore.instance.collection('HILS');
   String orderQuery = 'name';
+  String searchValue = '';
+
+  Future<void> deleteStudent(String id) async {
+    return studentInfo
+           .doc(id).delete()
+           .then((value) => print("삭제되었습니다"))
+           .catchError((error) => print("문제가 발생했습니다"));                
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -98,12 +106,25 @@ class _StudentInfoState extends State<StudentInfoPage> {
                               IconButton(
                                 icon: const Icon(Icons.delete),
                                 color: Colors.black,
-                                onPressed: () async {
-                                  await studentInfo
-                                  .doc(document.id).delete()
-                                  .then((value) => print("삭제되었습니다"))
-                                  .catchError((error) => print("문제가 발생했습니다"));
-                                },
+                                onPressed: () => showDialog(
+                                  context: context, 
+                                  builder: (context) => AlertDialog(
+                                    title: Text("정말 삭제하시겠습니까?"),
+                                    actions: [
+                                      TextButton(
+                                        child: Text("취소"),
+                                        onPressed: () => Navigator.pop(context),
+                                      ),
+                                      TextButton(
+                                        child: Text("삭제"),
+                                        onPressed: () {
+                                          deleteStudent(document.id);
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ), 
                               ),
                             ],
                           ),
