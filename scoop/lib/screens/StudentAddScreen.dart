@@ -10,14 +10,13 @@ class StudentAddScreen extends StatefulWidget {
 
 class _StudentAddState extends State<StudentAddScreen>{
   final formKey = GlobalKey<FormState>();
-  CollectionReference studentInfo = FirebaseFirestore.instance.collection('HILS');
+  CollectionReference studentInfo = FirebaseFirestore.instance.collection('students');
 
   Future<void> addStudent() async {
     return studentInfo.add({
       'name': name,
       'birth': birth,
       'coach': coach,
-      'status': 0,
     }).then((value) => print("업로드 성공"))
     .catchError((error) => print("문제가 발생했습니다: $error"));
   }

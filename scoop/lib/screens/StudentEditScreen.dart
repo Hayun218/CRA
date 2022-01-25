@@ -20,7 +20,7 @@ class StudentEditScreen extends StatefulWidget {
 
 class _StudentEditState extends State<StudentEditScreen>{
   final formKey = GlobalKey<FormState>();
-  CollectionReference studentInfo = FirebaseFirestore.instance.collection('HILS');
+  CollectionReference studentInfo = FirebaseFirestore.instance.collection('students');
 
   Future<void> editStudent() async {
     return studentInfo.doc(widget.docId).update({
