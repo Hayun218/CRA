@@ -5,14 +5,14 @@ import 'package:scoop/photos.dart';
 
 import 'dashboard.dart';
 import 'student.dart';
-import 'student_info.dart';
+import 'notice.dart';
 
 enum PageState {
   dashboard,
   photos,
   student,
   // ignore: constant_identifier_names
-  student_info,
+  notice,
 }
 
 final controller = PageController(
@@ -68,9 +68,9 @@ class _HighlightPageState extends State<HighlightPage> {
           ),
           IconButton(
             onPressed: () => controller.jumpToPage(3),
-            icon: Icon(widget.pageState == PageState.student_info
-                ? Icons.photo_camera
-                : Icons.photo_camera_outlined),
+            icon: Icon(widget.pageState == PageState.notice
+                ? Icons.settings
+                : Icons.settings_outlined),
           ),
         ],
       ),
@@ -100,7 +100,7 @@ class _HighlightPageState extends State<HighlightPage> {
         },
         children: [
           DashboardPage(),
-          StudentInfoPage(),
+          Notice(),
           StudentPage(),
           PhotoPage(),
         ],

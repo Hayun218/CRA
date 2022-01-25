@@ -58,7 +58,7 @@ class BottomAppBarProvider extends ChangeNotifier {
         _pageState = PageState.photos;
         break;
       case 3:
-        _pageState = PageState.student_info;
+        _pageState = PageState.notice;
     }
     notifyListeners();
   }
