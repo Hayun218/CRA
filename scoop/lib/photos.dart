@@ -14,6 +14,13 @@ class PhotoPage extends StatefulWidget {
 class _PhotoState extends State<PhotoPage> {
   CollectionReference photo = FirebaseFirestore.instance.collection('photo');
 
+  Future<void> deletePhoto(String id) async {
+    return photo
+           .doc(id).delete()
+           .then((value) => print("삭제되었습니다"))
+           .catchError((error) => print("문제가 발생했습니다"));                
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,12 +61,25 @@ class _PhotoState extends State<PhotoPage> {
                   trailing: IconButton(
                     icon: const Icon(Icons.delete),
                     color: Colors.black,
-                    onPressed: () async {
-                      await photo
-                            .doc(document.id).delete()
-                            .then((value) => print("삭제되었습니다"))
-                            .catchError((error) => print("문제가 발생했습니다"));
-                    },
+                    onPressed: () => showDialog(
+                      context: context, 
+                      builder: (context) => AlertDialog(
+                        title: Text("정말 삭제하시겠습니까?"),
+                        actions: [
+                          TextButton(
+                            child: Text("취소"),
+                            onPressed: () => Navigator.pop(context),
+                          ),
+                          TextButton(
+                            child: Text("삭제"),
+                            onPressed: () {
+                              deletePhoto(document.id);
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 );
               }).toList(),

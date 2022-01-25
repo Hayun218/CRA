@@ -1,5 +1,6 @@
-import 'package:flutter/cupertino.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:scoop/screens/PostEditScreen.dart';
 
 class Post extends StatefulWidget {
   final Map<String, dynamic> data;
@@ -15,6 +16,15 @@ class Post extends StatefulWidget {
 }
 
 class _PostState extends State<Post> {
+  CollectionReference notice = FirebaseFirestore.instance.collection('notice');
+
+  Future<void> deletePost(String id) async {
+    return notice
+           .doc(id).delete()
+           .then((value) => print("삭제되었습니다"))
+           .catchError((error) => print("문제가 발생했습니다"));                
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,21 +44,59 @@ class _PostState extends State<Post> {
             widget.data['title'],
             style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
           ),
-          Container(height: 10,),
+          const SizedBox(height: 10,),
           IntrinsicHeight(
             child: Row( 
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                IconButton(
+                  icon: const Icon(Icons.edit),
+                  onPressed: () {
+                    Navigator.push(
+                      context, 
+                      MaterialPageRoute(builder: (context) => PostEditScreen(
+                        data: widget.data,
+                        id: widget.id,
+                      )),
+                    );
+                  }
+                ),
                 Text(widget.data['author'], style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w300)),
-                const VerticalDivider( thickness: 1, color: Colors.grey, ),
+                const VerticalDivider(thickness: 1, color: Colors.grey),
                 Text(widget.data['date'], style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w300)),
+                IconButton(
+                  icon: const Icon(Icons.delete),
+                  onPressed: () => showDialog(
+                    context: context, 
+                    builder: (context) => AlertDialog(
+                      title: Text("정말 삭제하시겠습니까?"),
+                      actions: [
+                        TextButton(
+                          child: Text("취소"),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                        TextButton(
+                          child: Text("삭제"),
+                          onPressed: () {
+                            deletePost(widget.id);
+                            Navigator.pop(context);
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
-          Container(height: 10,),
-          const Divider( thickness: 1, color: Colors.grey,),
-          Container(height: 10,),
-          Text(widget.data['content']),
+          const SizedBox(height: 10,),
+          Container(height: 1, width: 370, color: Colors.grey),
+          const SizedBox(height: 10,),
+          SizedBox(
+            width: 370,
+            child: Text(widget.data['content']),
+          ),
         ],
       ), 
     );

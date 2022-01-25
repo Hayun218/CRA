@@ -1,23 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart';
+import 'package:scoop/screens/PostAddScreen.dart';
 
-class PostAddScreen extends StatefulWidget {
-  const PostAddScreen({Key? key}) : super(key: key);
+class PostEditScreen extends StatefulWidget {
+  final Map<String, dynamic> data;
+  final String id;
+
+  const PostEditScreen({
+    required this.data,
+    required this.id,
+  });
 
   @override
-  _PostAddState createState() => _PostAddState();
+  _PostEditState createState() => _PostEditState();
 }
 
-class _PostAddState extends State<PostAddScreen>{
+class _PostEditState extends State<PostEditScreen>{
   final formKey = GlobalKey<FormState>();
-  CollectionReference studentInfo = FirebaseFirestore.instance.collection('notice');
+  CollectionReference notice = FirebaseFirestore.instance.collection('notice');
 
-  Future<void> addPost() async {
-    return studentInfo.add({
+  Future<void> editPost() async {
+    return notice.doc(widget.id).update({
       'title': title, //포스트 제목
-      'date': DateFormat.yMd().format(DateTime.now()).toString(), //생성 시간 
-      'author': coach, //현재 유저 (user?.uid)
+      'author': widget.data['author'], //현재 유저 (user?.uid)
       'content': content, //포스트 내용
       'category': category, //카테고리 필요할까??
     }).then((value) => print("업로드 성공"))
@@ -41,7 +46,7 @@ class _PostAddState extends State<PostAddScreen>{
         ),
         centerTitle: true,
         title: const Text(
-          "새 포스트 추가",
+          "포스트 수정",
           style: TextStyle(color: Colors.black, fontSize: 17, fontWeight: FontWeight.w700)),
         backgroundColor: Colors.white,
         elevation: 0,
@@ -52,7 +57,7 @@ class _PostAddState extends State<PostAddScreen>{
           children: [
             renderPostAddField(
               label: '제목', 
-              value: '',
+              value: widget.data['title'],
               lineNum: 1,
               onSaved: (val) {
                 setState(() {
@@ -69,7 +74,7 @@ class _PostAddState extends State<PostAddScreen>{
             ),
             renderPostAddField(
               label: '내용', 
-              value: '',
+              value: widget.data['content'],
               lineNum: 8,
               onSaved: (val) {
                 setState(() {
@@ -86,7 +91,7 @@ class _PostAddState extends State<PostAddScreen>{
             ),
             renderPostAddField(
               label: '카테고리', 
-              value: '',
+              value: widget.data['category'],
               lineNum: 1,
               onSaved: (val) {
                 setState(() {
@@ -105,7 +110,8 @@ class _PostAddState extends State<PostAddScreen>{
               onPressed: () async {
                 if (formKey.currentState!.validate()) {
                   formKey.currentState!.save();
-                  addPost();
+                  editPost();
+                  Navigator.pop(context);
                   Navigator.pop(context);
                 }
               },
@@ -122,44 +128,4 @@ class _PostAddState extends State<PostAddScreen>{
       ),
     );
   }
-}
-
-renderPostAddField({
-  required String label,
-  required FormFieldSetter onSaved,
-  required FormFieldValidator validator,
-  required String value,
-  required int lineNum,
-}) {
-
-  return 
-  Padding(
-    padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
-    child: Column(
-      children: [
-        Row(
-          children: [
-            Text(
-              label,
-              style: const TextStyle(
-                fontSize: 12.0,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8,),
-        TextFormField(
-          decoration: const InputDecoration(
-            border: OutlineInputBorder(),
-          ),
-          onSaved: onSaved,
-          validator: validator,
-          initialValue: value,
-          maxLines: lineNum,
-        ),
-        Container(height: 8.0),
-      ],
-    )
-  );
 }

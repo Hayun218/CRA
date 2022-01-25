@@ -46,8 +46,14 @@ class _NoticeState extends State<Notice> {
               children: snapshot.data!.docs.map((DocumentSnapshot document) {
                 Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
                 return ListTile(
-                  title: Text(data['title']),
-                  subtitle: Text(data['content']),
+                  title: Row(children: [
+                    Text(data['title']),
+                    Text(
+                      '   ' + data['date'],
+                      style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w300),
+                    ),
+                  ]),
+                  subtitle: Text(data['content'], overflow: TextOverflow.ellipsis),
                   onTap: () {
                     Navigator.push(
                       context, 
