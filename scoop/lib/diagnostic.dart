@@ -2,18 +2,18 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animations/loading_animations.dart';
 
-class StudentGrades extends StatefulWidget {
+class DignosticPage extends StatefulWidget {
   String stuUID;
-  StudentGrades({required this.stuUID});
+  DignosticPage({required this.stuUID});
   @override
-  _StudentGradesState createState() => _StudentGradesState();
+  _DignosticPageState createState() => _DignosticPageState();
 }
 
-class _StudentGradesState extends State<StudentGrades> {
+class _DignosticPageState extends State<DignosticPage> {
   @override
   Widget build(BuildContext context) {
     Stream<DocumentSnapshot> student = FirebaseFirestore.instance
-        .collection('students')
+        .collection('HILS')
         .doc(widget.stuUID) //FirebaseAuth.instance.currentUser!.uid
         .snapshots();
     return StreamBuilder<DocumentSnapshot>(
