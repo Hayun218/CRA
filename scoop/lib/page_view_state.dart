@@ -5,7 +5,6 @@ import 'package:scoop/photos.dart';
 
 import 'dashboard.dart';
 import 'student.dart';
-import 'student_info.dart';
 import 'notice.dart';
 
 enum PageState {
@@ -101,10 +100,9 @@ class _HighlightPageState extends State<HighlightPage> {
         },
         children: [
           DashboardPage(),
-          StudentInfoPage(),
+          Notice(),
           StudentPage(),
           PhotoPage(),
-          Notice(),
         ],
       ),
     );
