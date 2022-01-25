@@ -12,7 +12,7 @@ class StudentInfoPage extends StatefulWidget {
 }
 
 class _StudentInfoState extends State<StudentInfoPage> {
-  CollectionReference studentInfo = FirebaseFirestore.instance.collection('HILS');
+  CollectionReference studentInfo = FirebaseFirestore.instance.collection('students');
   String orderQuery = 'name';
   String searchValue = '';
 
