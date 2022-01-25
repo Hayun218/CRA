@@ -69,8 +69,8 @@ class _HighlightPageState extends State<HighlightPage> {
           IconButton(
             onPressed: () => controller.jumpToPage(3),
             icon: Icon(widget.pageState == PageState.notice
-                ? Icons.settings
-                : Icons.settings_outlined),
+                ? Icons.photo_camera
+                : Icons.photo_camera_outlined),
           ),
         ],
       ),
