@@ -23,19 +23,19 @@ BottomAppBar appBar(BuildContext context) {
         ),
         IconButton(
           onPressed: () => controller.jumpToPage(1),
-          icon: Icon(
-              pageChanged == 1 ? Icons.fact_check : Icons.fact_check_outlined),
+          icon:
+              Icon(pageChanged == 1 ? Icons.thumb_up : Icons.thumb_up_outlined),
         ),
         IconButton(
           onPressed: () => controller.jumpToPage(2),
-          icon: Icon(pageChanged == 2
-              ? Icons.photo_camera
-              : Icons.photo_camera_outlined),
+          icon: Icon(
+              pageChanged == 2 ? Icons.fact_check : Icons.fact_check_outlined),
         ),
         IconButton(
           onPressed: () => controller.jumpToPage(3),
-          icon:
-              Icon(pageChanged == 3 ? Icons.settings : Icons.settings_outlined),
+          icon: Icon(pageChanged == 3
+              ? Icons.photo_camera
+              : Icons.photo_camera_outlined),
         ),
       ],
     ),

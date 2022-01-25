@@ -13,18 +13,25 @@ class StudentPage extends StatefulWidget {
   _StudentPageState createState() => _StudentPageState();
 }
 
+int _isStudent = 0;
+
 DateTime todayDate = DateTime.now();
 String givenDate = formatDate(todayDate, [yyyy, '년 ', mm, '월 ', dd, '일']);
 User user = FirebaseAuth.instance.currentUser!;
 
-Stream<DocumentSnapshot> student = FirebaseFirestore.instance
-    .collection('HILS')
+// teacher: qYv2MAMjyVhtAy5So6Gl
+// student: OItT9gC2wKg1EPRbHlBtR3lBBes2
+
+Stream<DocumentSnapshot> students = FirebaseFirestore.instance
+    .collection('students')
     .doc(
-        '0l56kbyKRsSMKSTptihedzTFwaC2') //FirebaseAuth.instance.currentUser!.uid
+        'klyNtQr5grgi6wyFnSVq6qnt9YL2') //FirebaseAuth.instance.currentUser!.uid
     .snapshots();
 
-// teacher: 0l56kbyKRsSMKSTptihedzTFwaC2
-// student: OItT9gC2wKg1EPRbHlBtR3lBBes2
+Stream<DocumentSnapshot> coach = FirebaseFirestore.instance
+    .collection('coach')
+    .doc('qYv2MAMjyVhtAy5So6Gl') //FirebaseAuth.instance.currentUser!.uid
+    .snapshots();
 
 _launchURL(String url) async {
   if (await canLaunch(url)) {
@@ -34,62 +41,10 @@ _launchURL(String url) async {
   }
 }
 
-//
-// void showContentDialog(context, data) {
-//   showDialog(
-//       context: context,
-//       barrierDismissible: true,
-//       builder: (BuildContext context) {
-//         return AlertDialog(
-//           title: Center(child: Text("생활기록부 URL")),
-//           shape:
-//               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-//           content: Column(
-//             mainAxisSize: MainAxisSize.min,
-//             crossAxisAlignment: CrossAxisAlignment.start,
-//             children: <Widget>[
-//               Text("URL: " + data['생활기록부']),
-//               SizedBox(height: 10),
-//               Text("Time: " + data['time']),
-//               SizedBox(height: 10),
-//               Row(
-//                 children: [
-//                   Text("Priority: "),
-//                   if (data['priority'] == 1)
-//                     Icon(Icons.circle, color: Colors.red),
-//                   if (data['priority'] == 2)
-//                     Icon(Icons.circle, color: Colors.blue),
-//                   if (data['priority'] == 3)
-//                     Icon(Icons.circle, color: Colors.green),
-//                 ],
-//               ),
-//               SizedBox(height: 10),
-//               Text("Content: " + data['content']),
-//             ],
-//           ),
-//           actions: <Widget>[
-//             FlatButton(
-//               child: new Text("삭제"),
-//               onPressed: () {
-//                 deleteToDo(data);
-//                 Navigator.pop(context);
-//               },
-//             ),
-//             FlatButton(
-//               child: new Text("수정"),
-//               onPressed: () {
-//                 Navigator.pop(context);
-//                 addContentDialog(context, data);
-//               },
-//             ),
-//           ],
-//         );
-//       });
-// }
 TextEditingController _studentRecordURL = TextEditingController();
 
 getRecordLink(String stuUID) async {
-  var collection = FirebaseFirestore.instance.collection('HILS');
+  var collection = FirebaseFirestore.instance.collection('students');
   var docSnapshot = await collection.doc(stuUID).get();
   String link = "";
   if (docSnapshot.exists) {
@@ -102,7 +57,7 @@ getRecordLink(String stuUID) async {
 }
 
 updateRecordURL(String stuUID, TextEditingController record) async {
-  var stuDoc = FirebaseFirestore.instance.collection('HILS').doc(stuUID);
+  var stuDoc = FirebaseFirestore.instance.collection('students').doc(stuUID);
   return stuDoc.set({"record": record.text}, SetOptions(merge: true));
 }
 
@@ -125,7 +80,7 @@ class _StudentPageState extends State<StudentPage> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<DocumentSnapshot>(
-        stream: student,
+        stream: _isStudent == 1 ? students : coach,
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Text('Error: ${snapshot.error}');
@@ -135,21 +90,21 @@ class _StudentPageState extends State<StudentPage> {
           }
 
           var data = snapshot.data;
-          int _isTeacher = data!["status"];
 
           return Scaffold(
             backgroundColor: Colors.white,
             appBar: AppBar(
-              title: data["status"] == 0
-                  ? Text(data["name"] + " " + data['birth'],
-                      style: TextStyle(color: Colors.black, fontSize: 17))
-                  : Text(data["name"] + " 코치",
-                      style: TextStyle(color: Colors.black, fontSize: 17)),
+              title: _isStudent == 1
+                  ? Text(data!["name"] + " " + data['birth'],
+                      style: const TextStyle(color: Colors.black, fontSize: 17))
+                  : Text(data!["name"] + " 코치",
+                      style:
+                          const TextStyle(color: Colors.black, fontSize: 17)),
               backgroundColor: Colors.white,
               elevation: 0,
             ),
             body:
-                _isTeacher == 1 ? Teacher(data: data) : StudentSide(data: data),
+                _isStudent == 0 ? Teacher(data: data) : StudentSide(data: data),
           );
         });
   }
@@ -170,7 +125,7 @@ class _TeacherState extends State<Teacher> {
   @override
   Widget build(BuildContext context) {
     var data = widget.data;
-    List<String> studentKeys = widget.data["students"].keys.toList();
+    List<String> studentKeys = widget.data["myStudent"].keys.toList();
 
     return Container(
       margin: const EdgeInsets.fromLTRB(30, 0, 30, 30),
@@ -199,7 +154,7 @@ class _TeacherState extends State<Teacher> {
               setState(() {
                 _selectedStu = value;
 
-                _selectedUid = data["students"][value];
+                _selectedUid = data["myStudent"][value];
                 getRecordLink(_selectedUid);
                 print(_selectedStu + " " + _selectedUid);
               });
@@ -234,7 +189,7 @@ class _TeacherState extends State<Teacher> {
                         barrierDismissible: true,
                         builder: (BuildContext context) {
                           return AlertDialog(
-                            title: Center(
+                            title: const Center(
                               child: Text(
                                 "생활기록부",
                               ),
