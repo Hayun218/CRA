@@ -133,7 +133,10 @@ renderTextFormField({
     required String value,
   }) {
 
-    return Column(
+    return 
+    Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
       children: [
         Row(
           children: [
@@ -153,5 +156,6 @@ renderTextFormField({
         ),
         Container(height: 16.0),
       ],
-    );
+    )
+  );
   }

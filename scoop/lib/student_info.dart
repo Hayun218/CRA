@@ -31,6 +31,7 @@ class _StudentInfoState extends State<StudentInfoPage> {
         iconTheme: const IconThemeData(
           color: Colors.black,
         ),
+        centerTitle: true,
         title: const Text(
           "학생정보관리",
           style: TextStyle(color: Colors.black, fontSize: 17, fontWeight: FontWeight.w700)),

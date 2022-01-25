@@ -22,6 +22,7 @@ class _PhotoState extends State<PhotoPage> {
         iconTheme: const IconThemeData(
           color: Colors.black,
         ),
+        centerTitle: true,
         title: const Text(
           "사진",
           style: TextStyle(color: Colors.black, fontSize: 17, fontWeight: FontWeight.w700)),
@@ -182,7 +183,10 @@ renderTextFormField({
     required FormFieldValidator validator,
   }) {
 
-    return Column(
+    return 
+    Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
       children: [
         Row(
           children: [
@@ -201,5 +205,6 @@ renderTextFormField({
         ),
         Container(height: 16.0),
       ],
-    );
+    )
+  );
   }

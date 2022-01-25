@@ -1,30 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
-class StudentAddScreen extends StatefulWidget {
-  const StudentAddScreen({Key? key}) : super(key: key);
+class PostAddScreen extends StatefulWidget {
+  const PostAddScreen({Key? key}) : super(key: key);
 
   @override
-  _StudentAddState createState() => _StudentAddState();
+  _PostAddState createState() => _PostAddState();
 }
 
-class _StudentAddState extends State<StudentAddScreen>{
+class _PostAddState extends State<PostAddScreen>{
   final formKey = GlobalKey<FormState>();
-  CollectionReference studentInfo = FirebaseFirestore.instance.collection('HILS');
+  CollectionReference studentInfo = FirebaseFirestore.instance.collection('notice');
 
-  Future<void> addStudent() async {
+  Future<void> addPost() async {
     return studentInfo.add({
-      'name': name,
-      'birth': birth,
-      'coach': coach,
-      'status': 0,
+      'title': title, //포스트 제목
+      'date': DateFormat.yMd().format(DateTime.now()).toString(), //생성 시간 
+      'author': coach, //현재 유저 (user?.uid)
+      'content': content, //포스트 내용
+      'category': category, //카테고리 필요할까??
     }).then((value) => print("업로드 성공"))
     .catchError((error) => print("문제가 발생했습니다: $error"));
   }
 
-  String name = '';
-  String birth = '';
+  String title = '';
   String coach = '';
+  String content = '';
+  String category = '';
 
   @override
   Widget build(BuildContext context) {
@@ -35,8 +38,9 @@ class _StudentAddState extends State<StudentAddScreen>{
         iconTheme: const IconThemeData(
           color: Colors.black,
         ),
+        centerTitle: true,
         title: const Text(
-          "학생 정보 추가",
+          "새 포스트 추가",
           style: TextStyle(color: Colors.black, fontSize: 17, fontWeight: FontWeight.w700)),
         backgroundColor: Colors.white,
         elevation: 0,
@@ -45,50 +49,52 @@ class _StudentAddState extends State<StudentAddScreen>{
         key: formKey,
         child: Column(
           children: [
-            renderTextFormField(
-              label: '학생 이름', 
+            renderPostAddField(
+              label: '제목', 
               value: '',
+              lineNum: 1,
               onSaved: (val) {
                 setState(() {
-                  name = val;
+                  title = val;
                 });
               }, 
               validator: (val) {
                 if (val.length < 1) {
-                  return '이름을 입력해주세요';
+                  return '제목을 입력해주세요';
                 }
 
                 return null;
               },
             ),
-            renderTextFormField(
-              label: '생년월일 (YY/MM/DD)', 
+            renderPostAddField(
+              label: '내용', 
               value: '',
+              lineNum: 8,
               onSaved: (val) {
                 setState(() {
-                  birth = val;
+                  content = val;
                 });
               }, 
               validator: (val) {
                 if (val.length < 1) {
-                  return '생년월일을 입력해주세요';
+                  return '내용을 입력해주세요';
                 }
 
                 return null;
               },
             ),
-            // 여기는 select로 바꿔도 될듯
-            renderTextFormField(
-              label: '담당 선생님 이름', 
+            renderPostAddField(
+              label: '카테고리', 
               value: '',
+              lineNum: 1,
               onSaved: (val) {
                 setState(() {
-                  coach = val;
+                  category = val;
                 });
               }, 
               validator: (val) {
                 if (val.length < 1) {
-                  return '담당 선생님을 입력해주세요';
+                  return '카테고리를 입력해주세요';
                 }
 
                 return null;
@@ -98,7 +104,7 @@ class _StudentAddState extends State<StudentAddScreen>{
               onPressed: () async {
                 if (formKey.currentState!.validate()) {
                   formKey.currentState!.save();
-                  addStudent();
+                  addPost();
                   Navigator.pop(context);
                 }
               },
@@ -117,17 +123,18 @@ class _StudentAddState extends State<StudentAddScreen>{
   }
 }
 
-renderTextFormField({
-    required String label,
-    required FormFieldSetter onSaved,
-    required FormFieldValidator validator,
-    required String value,
-  }) {
+renderPostAddField({
+  required String label,
+  required FormFieldSetter onSaved,
+  required FormFieldValidator validator,
+  required String value,
+  required int lineNum,
+}) {
 
-    return 
-    Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
+  return 
+  Padding(
+    padding: const EdgeInsets.all(16.0),
+    child: Column(
       children: [
         Row(
           children: [
@@ -141,12 +148,16 @@ renderTextFormField({
           ],
         ),
         TextFormField(
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+          ),
           onSaved: onSaved,
           validator: validator,
           initialValue: value,
+          maxLines: lineNum,
         ),
         Container(height: 16.0),
       ],
     )
   );
-  }
+}
