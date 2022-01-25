@@ -57,20 +57,20 @@ class _HighlightPageState extends State<HighlightPage> {
           IconButton(
             onPressed: () => controller.jumpToPage(1),
             icon: Icon(widget.pageState == PageState.student
-                ? Icons.fact_check
-                : Icons.fact_check_outlined),
+                ? Icons.thumb_up
+                : Icons.thumb_up_outlined),
           ),
           IconButton(
             onPressed: () => controller.jumpToPage(2),
             icon: Icon(widget.pageState == PageState.photos
-                ? Icons.photo_camera
-                : Icons.photo_camera_outlined),
+                ? Icons.fact_check
+                : Icons.fact_check_outlined),
           ),
           IconButton(
             onPressed: () => controller.jumpToPage(3),
             icon: Icon(widget.pageState == PageState.student_info
-                ? Icons.settings
-                : Icons.settings_outlined),
+                ? Icons.photo_camera
+                : Icons.photo_camera_outlined),
           ),
         ],
       ),
@@ -100,9 +100,9 @@ class _HighlightPageState extends State<HighlightPage> {
         },
         children: [
           DashboardPage(),
+          StudentInfoPage(),
           StudentPage(),
           PhotoPage(),
-          StudentInfoPage(),
         ],
       ),
     );

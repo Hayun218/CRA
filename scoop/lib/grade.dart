@@ -13,7 +13,7 @@ class _StudentGradesState extends State<StudentGrades> {
   @override
   Widget build(BuildContext context) {
     Stream<DocumentSnapshot> student = FirebaseFirestore.instance
-        .collection('HILS')
+        .collection('students')
         .doc(widget.stuUID) //FirebaseAuth.instance.currentUser!.uid
         .snapshots();
     return StreamBuilder<DocumentSnapshot>(
