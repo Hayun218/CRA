@@ -275,21 +275,21 @@ class _TeacherState extends State<Teacher> {
             ],
           ),
           const SizedBox(height: 80),
-          Row(
-            children: [
-              Text(givenDate),
-            ],
-          ),
-          const SizedBox(height: 30),
-          TextField(
-            decoration: const InputDecoration(
-                border: OutlineInputBorder(), hintText: 'Teacher\'s Commment'),
-          ),
-          const SizedBox(height: 80),
-          TextField(
-            decoration: const InputDecoration(
-                border: OutlineInputBorder(), hintText: 'My Comment'),
-          ),
+          // Row(
+          //   children: [
+          //     Text(givenDate),
+          //   ],
+          // ),
+          // const SizedBox(height: 30),
+          // TextField(
+          //   decoration: const InputDecoration(
+          //       border: OutlineInputBorder(), hintText: 'Teacher\'s Commment'),
+          // ),
+          // const SizedBox(height: 80),
+          // TextField(
+          //   decoration: const InputDecoration(
+          //       border: OutlineInputBorder(), hintText: 'My Comment'),
+          // ),
         ],
       ),
     );
@@ -366,21 +366,21 @@ class _StudentSideState extends State<StudentSide> {
             ],
           ),
           const SizedBox(height: 80),
-          Row(
-            children: [
-              Text(givenDate),
-            ],
-          ),
-          const SizedBox(height: 30),
-          TextField(
-            decoration: const InputDecoration(
-                border: OutlineInputBorder(), hintText: 'Teacher\'s Commment'),
-          ),
-          const SizedBox(height: 80),
-          TextField(
-            decoration: const InputDecoration(
-                border: OutlineInputBorder(), hintText: 'My Comment'),
-          ),
+          // Row(
+          //   children: [
+          //     Text(givenDate),
+          //   ],
+          // ),
+          // const SizedBox(height: 30),
+          // TextField(
+          //   decoration: const InputDecoration(
+          //       border: OutlineInputBorder(), hintText: 'Teacher\'s Commment'),
+          // ),
+          // const SizedBox(height: 80),
+          // TextField(
+          //   decoration: const InputDecoration(
+          //       border: OutlineInputBorder(), hintText: 'My Comment'),
+          // ),
         ],
       ),
     );
