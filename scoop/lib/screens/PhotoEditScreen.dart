@@ -43,7 +43,7 @@ class _PhotoEditState extends State<PhotoEditScreen>{
           color: Colors.black,
         ),
         title: const Text(
-          "학생 정보 수정",
+          "사진 정보 수정",
           style: TextStyle(color: Colors.black, fontSize: 17, fontWeight: FontWeight.w700)),
         backgroundColor: Colors.white,
         elevation: 0,

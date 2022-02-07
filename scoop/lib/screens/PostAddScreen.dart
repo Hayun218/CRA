@@ -19,7 +19,7 @@ class _PostAddState extends State<PostAddScreen>{
       'date': DateFormat.yMd().format(DateTime.now()).toString(), //생성 시간 
       'author': coach, //현재 유저 (user?.uid)
       'content': content, //포스트 내용
-      'category': category, //카테고리 필요할까??
+      'category': category, //카테고리 
     }).then((value) => print("업로드 성공"))
     .catchError((error) => print("문제가 발생했습니다: $error"));
   }
@@ -27,7 +27,7 @@ class _PostAddState extends State<PostAddScreen>{
   String title = '';
   String coach = '';
   String content = '';
-  String category = '';
+  String category = '공지';
 
   @override
   Widget build(BuildContext context) {
@@ -84,23 +84,36 @@ class _PostAddState extends State<PostAddScreen>{
                 return null;
               },
             ),
-            renderPostAddField(
-              label: '카테고리', 
-              value: '',
-              lineNum: 1,
-              onSaved: (val) {
-                setState(() {
-                  category = val;
-                });
-              }, 
-              validator: (val) {
-                if (val.length < 1) {
-                  return '카테고리를 입력해주세요';
-                }
-
-                return null;
-              },
+            const Text(
+              '카테고리',
+              style: TextStyle(
+                fontSize: 12.0,
+                fontWeight: FontWeight.w700,
+              ),
             ),
+            DropdownButton<String>(
+              value: category,
+              icon: const Icon(Icons.arrow_downward),
+              elevation: 16,
+              style: const TextStyle(color: Colors.black),
+              underline: Container(
+                height: 2,
+                color: Colors.black,
+              ),
+              onChanged: (String? newValue) {
+                setState(() {
+                    category = newValue!;
+                });
+              },
+              items: <String>['공지', '홍보/이벤트']
+                .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+            ),
+            Container(height: 30.0,),
             ElevatedButton(
               onPressed: () async {
                 if (formKey.currentState!.validate()) {
