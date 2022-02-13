@@ -182,15 +182,24 @@ class _PostEditState extends State<PostEditScreen>{
               },
             ),
             const SizedBox(height: 8,),
-            Text(fileName, style: const TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold)),
+            (fileName != '파일 없음' && widget.data['filename'] != null)?
+              Text(widget.data['filename'], style: const TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold)):
+              Text(fileName, style: const TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold)),
             Container(height: 30.0,),
             ElevatedButton(
               onPressed: () async {
                 if (formKey.currentState!.validate()) {
                   formKey.currentState!.save();
-                  if (file == null) {
+                  // 원래 & 선택된 파일 없을 때
+                  if (widget.data['filename'] == null && fileName == '파일 없음') {
                     editPostNoFiles();
-                  } else {
+                  }
+                  // 원래 파일이 있었고 새로 선택된 파일이 없을 때
+                  else if (widget.data['filename'] != null && fileName == '파일 없음') {
+                    editPost(widget.data['link'], widget.data['filename']);
+                  } 
+                  // 선택된 파일이 있을 때
+                  else {
                     uploadFile();
                   }
                   Navigator.pop(context);
