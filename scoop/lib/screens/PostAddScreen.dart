@@ -182,12 +182,11 @@ class _PostAddState extends State<PostAddScreen>{
             ElevatedButton(
               onPressed: () async {
                 if (formKey.currentState!.validate()) {
-                  String a, b = '';
                   formKey.currentState!.save();
                   if (file == null) {
                     addPostNoFiles();
                   } else {
-
+                    uploadFile();
                   }
                   Navigator.pop(context);
                 }
