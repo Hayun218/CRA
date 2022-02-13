@@ -197,6 +197,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.2.7"
+  firestore_search:
+    dependency: "direct main"
+    description:
+      name: firestore_search
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.9"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -240,6 +247,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "9.2.0"
+  get:
+    dependency: transitive
+    description:
+      name: get
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.6.1"
   html:
     dependency: "direct main"
     description:

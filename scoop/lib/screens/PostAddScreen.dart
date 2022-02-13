@@ -19,7 +19,7 @@ class _PostAddState extends State<PostAddScreen>{
   final formKey = GlobalKey<FormState>();
   CollectionReference studentInfo = FirebaseFirestore.instance.collection('notice');
 
-  Future<void> addPost(String urlDownload) async {
+  Future<void> addPost(String urlDownload, String fileName) async {
     return studentInfo.add({
       'title': title, //포스트 제목
       'date': DateFormat.yMd().format(DateTime.now()).toString(), //생성 시간 
@@ -27,12 +27,26 @@ class _PostAddState extends State<PostAddScreen>{
       'content': content, //포스트 내용
       'category': category, //카테고리 
       'link': urlDownload,
+      'filename': fileName,
+    }).then((value) => print("업로드 성공"))
+    .catchError((error) => print("문제가 발생했습니다: $error"));
+  }
+
+  Future<void> addPostNoFiles() async {
+    return studentInfo.add({
+      'title': title, //포스트 제목
+      'date': DateFormat.yMd().format(DateTime.now()).toString(), //생성 시간 
+      'author': coach, //현재 유저 (user?.uid)
+      'content': content, //포스트 내용
+      'category': category, //카테고리 
+      'link': '',
+      'filename': '',
     }).then((value) => print("업로드 성공"))
     .catchError((error) => print("문제가 발생했습니다: $error"));
   }
 
   Future uploadFile() async {
-    if (file == null) return;
+    if (file == null)  return;
 
     final fileName = Path.basename(file!.path);
     final destination = 'files/$fileName';
@@ -44,7 +58,7 @@ class _PostAddState extends State<PostAddScreen>{
     final snapshot = await task!.whenComplete(() {});
     final urlDownload = await snapshot.ref.getDownloadURL();
 
-    addPost(urlDownload);
+    addPost(urlDownload, fileName);
   }
 
   String title = '';
@@ -168,8 +182,13 @@ class _PostAddState extends State<PostAddScreen>{
             ElevatedButton(
               onPressed: () async {
                 if (formKey.currentState!.validate()) {
+                  String a, b = '';
                   formKey.currentState!.save();
-                  uploadFile();
+                  if (file == null) {
+                    addPostNoFiles();
+                  } else {
+
+                  }
                   Navigator.pop(context);
                 }
               },

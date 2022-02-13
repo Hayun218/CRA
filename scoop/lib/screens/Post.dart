@@ -93,7 +93,11 @@ class _PostState extends State<Post> {
           const SizedBox(height: 10,),
           Container(height: 1, width: 370, color: Colors.grey),
           const SizedBox(height: 10,),
-          Image.network(widget.data['link'], fit: BoxFit.fitWidth,),
+          if (widget.data['link'].isEmpty) ...[
+            const SizedBox.shrink(),
+          ] else ...[
+            Image.network(widget.data['link'], fit: BoxFit.fitWidth,),
+          ],
           const SizedBox(height: 10,),
           SizedBox(
             width: 370,
