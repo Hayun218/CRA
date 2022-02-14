@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:scoop/screens/Drawer.dart';
-import 'package:scoop/student_info.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'event.dart';
 

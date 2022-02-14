@@ -64,25 +64,44 @@ class _NoticeState extends State<Notice> {
                 Row(
                   children: <Widget>[
                     Expanded(child: 
-                      TextField(
-                        controller: controller,
-                        decoration: const InputDecoration(
-                          prefixIcon: Icon(Icons.search),
-                          border: OutlineInputBorder(),
-                        ),
-                      ), 
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        child: TextField(
+                          controller: controller,
+                          decoration: InputDecoration(
+                            isDense: true,
+                            focusColor: Colors.lightBlueAccent,
+                            prefixIcon: Icon(Icons.search, color: Colors.black,),
+                            border: OutlineInputBorder(),
+                            suffixIcon: IconButton(
+                              icon: Icon(Icons.clear, color: controller.text.isNotEmpty ? Colors.black : Colors.transparent,),
+                              onPressed: () {
+                                setState(() {
+                                  query = '';
+                                });
+                                controller.clear();
+                              },
+                            ),
+                          ),
+                        ), 
+                      ),
                     ),
-                    ElevatedButton(
-                      onPressed: () {
-                        setState(() {
-                          query = controller.text;
-                        });
-                      }, 
-                      style: ButtonStyle(backgroundColor: MaterialStateProperty.all<Color>(Colors.lightBlueAccent)),
-                      child: const Text(
-                        '찾기',
-                        style: TextStyle(
-                          color: Colors.white,
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            query = controller.text;
+                          });
+                        }, 
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.lightBlueAccent,
+                        ),
+                        child: const Text(
+                          '찾기',
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
