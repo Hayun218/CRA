@@ -1,6 +1,12 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
+import 'package:path/path.dart' as Path;
+import 'package:scoop/api/file_api.dart';
 
 class PostAddScreen extends StatefulWidget {
   const PostAddScreen({Key? key}) : super(key: key);
@@ -13,24 +19,59 @@ class _PostAddState extends State<PostAddScreen>{
   final formKey = GlobalKey<FormState>();
   CollectionReference studentInfo = FirebaseFirestore.instance.collection('notice');
 
-  Future<void> addPost() async {
+  Future<void> addPost(String urlDownload, String fileName) async {
     return studentInfo.add({
       'title': title, //포스트 제목
       'date': DateFormat.yMd().format(DateTime.now()).toString(), //생성 시간 
       'author': coach, //현재 유저 (user?.uid)
       'content': content, //포스트 내용
-      'category': category, //카테고리 필요할까??
+      'category': category, //카테고리 
+      'link': urlDownload,
+      'filename': fileName,
     }).then((value) => print("업로드 성공"))
     .catchError((error) => print("문제가 발생했습니다: $error"));
+  }
+
+  Future<void> addPostNoFiles() async {
+    return studentInfo.add({
+      'title': title, //포스트 제목
+      'date': DateFormat.yMd().format(DateTime.now()).toString(), //생성 시간 
+      'author': coach, //현재 유저 (user?.uid)
+      'content': content, //포스트 내용
+      'category': category, //카테고리 
+      'link': '',
+      'filename': '',
+    }).then((value) => print("업로드 성공"))
+    .catchError((error) => print("문제가 발생했습니다: $error"));
+  }
+
+  Future uploadFile() async {
+    if (file == null)  return;
+
+    final fileName = Path.basename(file!.path);
+    final destination = 'files/$fileName';
+
+    task = FileApi.uploadFile(destination, file!);
+
+    if (task == null) return;
+
+    final snapshot = await task!.whenComplete(() {});
+    final urlDownload = await snapshot.ref.getDownloadURL();
+
+    addPost(urlDownload, fileName);
   }
 
   String title = '';
   String coach = '';
   String content = '';
-  String category = '';
+  String category = '공지';
+  File? file;
+  UploadTask? task;
 
   @override
   Widget build(BuildContext context) {
+    final fileName = file != null ? Path.basename(file!.path) : '파일 없음';
+
     return 
     Scaffold(
       resizeToAvoidBottomInset: false,
@@ -84,28 +125,69 @@ class _PostAddState extends State<PostAddScreen>{
                 return null;
               },
             ),
-            renderPostAddField(
-              label: '카테고리', 
-              value: '',
-              lineNum: 1,
-              onSaved: (val) {
+            const Text(
+              '카테고리',
+              style: TextStyle(
+                fontSize: 12.0,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            DropdownButton<String>(
+              value: category,
+              icon: const Icon(Icons.arrow_downward),
+              elevation: 16,
+              style: const TextStyle(color: Colors.black),
+              underline: Container(
+                height: 2,
+                color: Colors.black,
+              ),
+              onChanged: (String? newValue) {
                 setState(() {
-                  category = val;
+                    category = newValue!;
                 });
-              }, 
-              validator: (val) {
-                if (val.length < 1) {
-                  return '카테고리를 입력해주세요';
-                }
-
-                return null;
+              },
+              items: <String>['공지', '홍보/이벤트']
+                .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+            ),
+            const Text(
+              '파일 선택',
+              style: TextStyle(
+                fontSize: 12.0,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            ElevatedButton(
+              style: ButtonStyle(backgroundColor: MaterialStateProperty.all<Color>(Colors.lightBlueAccent)),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: const [
+                  Icon(Icons.attach_file),
+                  Text(
+                    '파일 선택'
+                  ),
+                ],
+              ),
+              onPressed: () {
+                selectFile();
               },
             ),
+            const SizedBox(height: 8,),
+            Text(fileName, style: const TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold)),
+            Container(height: 30.0,),
             ElevatedButton(
               onPressed: () async {
                 if (formKey.currentState!.validate()) {
                   formKey.currentState!.save();
-                  addPost();
+                  if (file == null) {
+                    addPostNoFiles();
+                  } else {
+                    uploadFile();
+                  }
                   Navigator.pop(context);
                 }
               },
@@ -122,6 +204,16 @@ class _PostAddState extends State<PostAddScreen>{
       ),
     );
   }
+
+  Future selectFile() async {
+    final result = await FilePicker.platform.pickFiles(allowMultiple: false);
+
+    if (result == null) return;
+    final path = result.files.single.path!;
+
+    setState(() => file = File(path));
+  }
+
 }
 
 renderPostAddField({

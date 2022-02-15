@@ -55,7 +55,7 @@ class _StudentGradesState extends State<StudentGrades> {
               iconTheme: IconThemeData(
                 color: Colors.black, //change your color here
               ),
-              title: Text(data!["name"] + " " + data!['birth'],
+              title: Text(data!["name"] + " " + data['birth'],
                   style: TextStyle(color: Colors.black, fontSize: 17)),
               backgroundColor: Colors.white,
               elevation: 0,

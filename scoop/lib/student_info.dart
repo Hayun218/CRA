@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:scoop/screens/StudentAddScreen.dart';
@@ -40,7 +42,7 @@ class _StudentInfoState extends State<StudentInfoPage> {
       ),
       body: 
         StreamBuilder<QuerySnapshot>(
-        stream: studentInfo.orderBy(orderQuery).snapshots(),
+        stream: studentInfo.snapshots(),
         builder: 
           (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.hasError) {
@@ -74,15 +76,36 @@ class _StudentInfoState extends State<StudentInfoPage> {
                         child: Text(value),
                       );
                     }).toList(),
+                ),
+                SizedBox(
+                  height: 30.0,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      listTitle(text: "이름"),
+                      listTitle(text: "생년월일"),
+                      listTitle(text: "담당코치"),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(onPressed: null, icon: const Icon(Icons.edit), color: Colors.transparent,),
+                          IconButton(onPressed: null, icon: const Icon(Icons.edit), color: Colors.transparent,),
+                        ],
+                      )
+                    ],
                   ),
+                ),
                 Expanded(child: ListView(
                   children: snapshot.data!.docs.map((DocumentSnapshot document) {
                     Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
                     var id = document.id;
                     return 
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
+                      SizedBox(
+                        height: 30.0,
+                        child: 
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
                           listBox(text: data['name']),
                           listBox(text: data['birth']),
                           listBox(text: data['coach']),
@@ -130,7 +153,8 @@ class _StudentInfoState extends State<StudentInfoPage> {
                             ],
                           ),
                         ],
-                      );
+                      )
+                    );
                   }).toList(),
                 ),
               ),  
@@ -152,8 +176,6 @@ class _StudentInfoState extends State<StudentInfoPage> {
   }
 }
 
-
-
 listBox ({
   required String text,
 }) {
@@ -167,6 +189,22 @@ listBox ({
         border: Border.all(width: 1.0, color: Colors.black),
       ),
     child: Text(text),
+  );
+}
+
+listTitle ({
+  required String text,
+}) {
+  return Container(
+    margin: const EdgeInsets.all(0.0),
+    padding: const EdgeInsets.all(3.0),
+    width: 100.0,
+    height: 30.0,
+    decoration: 
+      BoxDecoration(
+        border: Border.all(width: 1.0, color: Colors.transparent),
+      ),
+    child: Text(text, style: const TextStyle(fontWeight: FontWeight.bold),),
   );
 }
 

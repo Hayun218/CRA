@@ -12,7 +12,17 @@ class Notice extends StatefulWidget {
 }
 
 class _NoticeState extends State<Notice> {
-  CollectionReference post = FirebaseFirestore.instance.collection('notice');
+  Query<Map<String, dynamic>> post = FirebaseFirestore.instance.collection('notice').orderBy('date', descending: true);
+
+  String category = '공지';
+  String query = '';
+
+  final controller = TextEditingController();
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,40 +41,117 @@ class _NoticeState extends State<Notice> {
       ),
       body: 
         StreamBuilder<QuerySnapshot>(
-        stream: post.snapshots(),
+        stream: (controller.text != '' && controller.text != null)?
+          post.where('category', isEqualTo: category).where('title', isEqualTo: query).snapshots():
+          post.where('category', isEqualTo: category).snapshots(),
         builder: 
           (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.hasError) {
-              return const Text('Error Ocurred');
+              return const Center(child: Text('Error Ocurred'));
             }
 
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Text("Loading ...");
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (!snapshot.hasData) {
+              return const Center(child: Text('일치하는 글이 없습니다'),);
             }
           
-            return ListView(
-              children: snapshot.data!.docs.map((DocumentSnapshot document) {
-                Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
-                return ListTile(
-                  title: Row(children: [
-                    Text(data['title']),
-                    Text(
-                      '   ' + data['date'],
-                      style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w300),
+            return 
+            Column(
+              children: [
+                Row(
+                  children: <Widget>[
+                    Expanded(child: 
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        child: TextField(
+                          controller: controller,
+                          decoration: InputDecoration(
+                            isDense: true,
+                            focusColor: Colors.lightBlueAccent,
+                            prefixIcon: Icon(Icons.search, color: Colors.black,),
+                            border: OutlineInputBorder(),
+                            suffixIcon: IconButton(
+                              icon: Icon(Icons.clear, color: controller.text.isNotEmpty ? Colors.black : Colors.transparent,),
+                              onPressed: () {
+                                setState(() {
+                                  query = '';
+                                });
+                                controller.clear();
+                              },
+                            ),
+                          ),
+                        ), 
+                      ),
                     ),
-                  ]),
-                  subtitle: Text(data['content'], overflow: TextOverflow.ellipsis),
-                  onTap: () {
-                    Navigator.push(
-                      context, 
-                      MaterialPageRoute(builder: (context) => Post(
-                        data: data,
-                        id: document.id,
-                      )),
-                    );
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            query = controller.text;
+                          });
+                        }, 
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.lightBlueAccent,
+                        ),
+                        child: const Text(
+                          '찾기',
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                DropdownButton<String>(
+                  value: category,
+                  icon: const Icon(Icons.arrow_downward),
+                  elevation: 16,
+                  style: const TextStyle(color: Colors.black, fontSize: 16.0, ),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                        category = newValue!;
+                    });
                   },
-                );
-              }).toList(),
+                  items: <String>['공지', '홍보/이벤트']
+                    .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                ),
+                Expanded(child: 
+                  ListView(
+                    children: snapshot.data!.docs.map((DocumentSnapshot document) {
+                      Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
+                      return ListTile(
+                        title: Row(children: [
+                          Text(data['title']),
+                          Text(
+                            '   ' + data['date'],
+                            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w300),
+                          ),
+                        ]),
+                        subtitle: Text(data['content'], overflow: TextOverflow.ellipsis),
+                        onTap: () {
+                          Navigator.push(
+                            context, 
+                            MaterialPageRoute(builder: (context) => Post(
+                              data: data,
+                              id: document.id,
+                            )),
+                          );
+                        },
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ],
             );
           },
         ),

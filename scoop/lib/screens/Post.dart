@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:scoop/screens/PostEditScreen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Post extends StatefulWidget {
   final Map<String, dynamic> data;
@@ -47,7 +48,7 @@ class _PostState extends State<Post> {
           const SizedBox(height: 10,),
           IntrinsicHeight(
             child: Row( 
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 IconButton(
                   icon: const Icon(Icons.edit),
@@ -93,10 +94,28 @@ class _PostState extends State<Post> {
           const SizedBox(height: 10,),
           Container(height: 1, width: 370, color: Colors.grey),
           const SizedBox(height: 10,),
-          SizedBox(
-            width: 370,
-            child: Text(widget.data['content']),
-          ),
+          if (widget.data['link'].isEmpty) ...[
+            SizedBox(
+              width: 370,
+              child: Text(widget.data['content']),
+            ),
+          ] else ...[
+            Image.network(widget.data['link'], fit: BoxFit.fitWidth,),
+            const SizedBox(height: 10,),
+            SizedBox(
+              width: 370,
+              child: Text(widget.data['content']),
+            ),
+            const SizedBox(height: 10,),
+            Row(children: const [
+              Icon(Icons.attach_file),
+              Text('첨부파일', style: TextStyle(fontWeight: FontWeight.bold)),
+            ],),
+            ListTile(
+              title: widget.data['filename'],
+              onTap: () => launch(widget.data['link']),
+            ),
+          ],
         ],
       ), 
     );
