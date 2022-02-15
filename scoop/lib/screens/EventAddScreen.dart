@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:scoop/screens/PostAddScreen.dart';
+import 'package:syncfusion_flutter_datepicker/datepicker.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 
 class EventAddScreen extends StatefulWidget {
   const EventAddScreen({Key? key}) : super(key: key);
@@ -14,40 +16,31 @@ class _EventAddState extends State<EventAddScreen>{
   final formKey = GlobalKey<FormState>();
   CollectionReference event = FirebaseFirestore.instance.collection('events');
 
-  Future<void> addPost(String urlDownload, String fileName) async {
-    return event.add({
-      'title': title, //포스트 제목
-      'date': DateFormat.yMd().format(DateTime.now()).toString(), //생성 시간 
-      'author': coach, //현재 유저 (user?.uid)
-      'content': content, //포스트 내용
-      'category': category, //카테고리 
-      'link': urlDownload,
-      'filename': fileName,
-    }).then((value) => print("업로드 성공"))
-    .catchError((error) => print("문제가 발생했습니다: $error"));
-  }
-
-  Future<void> addPostNoFiles() async {
-    return event.add({
-      'title': title, //포스트 제목
-      'date': DateFormat.yMd().format(DateTime.now()).toString(), //생성 시간 
-      'author': coach, //현재 유저 (user?.uid)
-      'content': content, //포스트 내용
-      'category': category, //카테고리 
-      'link': '',
-      'filename': '',
-    }).then((value) => print("업로드 성공"))
-    .catchError((error) => print("문제가 발생했습니다: $error"));
-  }
-
+  final DateRangePickerController _controller = DateRangePickerController();
   String title = '';
-  String coach = '';
-  String content = '';
-  String category = '공지';
+  String selectedDate = '';
+  String displayDate = '';
+  String startTime = '';
+  String endTime = '';
+
+  Future<void> addEvent() async {
+    return event.add({
+      'title': title, 
+      'startTime': selectedDate + ' ' + startTime,
+      'endTime': selectedDate + ' ' + endTime,
+    }).then((value) => print("업로드 성공"))
+    .catchError((error) => print("문제가 발생했습니다: $error"));
+  }
+
+  void _onSelectionChanged(DateRangePickerSelectionChangedArgs args) {
+    setState(() {
+      selectedDate = DateFormat('dd/MM/yyyy').format(args.value).toString();
+      displayDate = DateFormat.yMd().format(args.value).toString();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-
     return 
     Scaffold(
       resizeToAvoidBottomInset: false,
@@ -78,7 +71,7 @@ class _EventAddState extends State<EventAddScreen>{
               }, 
               validator: (val) {
                 if (val.length < 1) {
-                  return '제목을 입력해주세요';
+                  return '내용을 입력해주세요';
                 }
 
                 return null;
@@ -91,13 +84,58 @@ class _EventAddState extends State<EventAddScreen>{
                 fontWeight: FontWeight.w700,
               ),
             ),
-            
+            SfDateRangePicker(
+              onSelectionChanged: _onSelectionChanged,
+              selectionMode: DateRangePickerSelectionMode.single,
+              view: DateRangePickerView.month,
+              monthViewSettings: const DateRangePickerMonthViewSettings(firstDayOfWeek: 1),
+              showNavigationArrow: true,
+              controller: _controller,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    DatePicker.showTimePicker(
+                      context,
+                      showTitleActions: true,
+                      currentTime: DateTime.now(),
+                      locale: LocaleType.ko,
+                      onConfirm: (time) {
+                        setState(() {
+                          startTime = DateFormat('HH:mm:ss').format(time).toString();
+                        });
+                      }
+                    ); 
+                  },
+                  child: const Text('시작 시간 선택'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    DatePicker.showTimePicker(
+                      context,
+                      showTitleActions: true,
+                      currentTime: DateTime.now(),
+                      locale: LocaleType.ko,
+                      onConfirm: (time) {
+                        setState(() {
+                          endTime = DateFormat('HH:mm:ss').format(time).toString();
+                        });
+                      }
+                    ); 
+                  },
+                  child: const Text('종료 시간 선택'),
+                ),
+              ],
+            ),
+            Text('선택된 날짜: $displayDate 시간: $startTime - $endTime'),
             Container(height: 30.0,),
             ElevatedButton(
               onPressed: () async {
                 if (formKey.currentState!.validate()) {
                   formKey.currentState!.save();
-                    addPostNoFiles();
+                  addEvent();
                   Navigator.pop(context);
                 }
               },

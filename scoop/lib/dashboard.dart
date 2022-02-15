@@ -18,38 +18,38 @@ class DashboardPage extends StatefulWidget {
 class _DashboardState extends State<DashboardPage> {
   final List<Color> _colorCollection = <Color>[];
   MeetingDataSource? events;
-  final List<String> options = <String>['Add', 'Delete', 'Update'];
   final databaseReference = FirebaseFirestore.instance;
 
   @override
-void initState() {
-  _initializeEventColor();
-  getDataFromFireStore().then((results) {
-    SchedulerBinding.instance!.addPostFrameCallback((timeStamp) {
-      setState(() {});
+  void initState() {
+    _initializeEventColor();
+    getDataFromFireStore().then((results) {
+      SchedulerBinding.instance!.addPostFrameCallback((timeStamp) {
+        setState(() {});
+      });
     });
-  });
-  super.initState();
-}
+    super.initState();
+  }
 
-Future<void> getDataFromFireStore() async {
-  var snapShotsValue = await databaseReference
-  .collection("events")
-  .get();
+  Future<void> getDataFromFireStore() async {
+    var snapShotsValue = await databaseReference
+    .collection("events")
+    .get();
 
-  final Random random = new Random();
-  List<Meeting> list = snapShotsValue.docs
-  .map((e) => Meeting(
-  eventName: e.data()['Subject'],
-  from:  DateFormat('dd/MM/yyyy HH:mm:ss').parse(e.data()['StartTime']),
-  to: DateFormat('dd/MM/yyyy HH:mm:ss').parse(e.data()['EndTime']),
-  background: _colorCollection[random.nextInt(9)],
-  isAllDay: false))
-  .toList();
+    final Random random = new Random();
+    List<Meeting> list = snapShotsValue.docs
+    .map((e) => Meeting(
+      eventName: e.data()['title'],
+      from: DateFormat('dd/MM/yyyy HH:mm:ss').parse(e.data()['startTime']),
+      to: DateFormat('dd/MM/yyyy HH:mm:ss').parse(e.data()['endTime']),
+      background: _colorCollection[random.nextInt(9)],
+      isAllDay: false)
+    )
+    .toList();
     setState(() {
-  events = MeetingDataSource(list);
-  });
-}
+      events = MeetingDataSource(list);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,30 +66,32 @@ Future<void> getDataFromFireStore() async {
         backgroundColor: Colors.white,
         elevation: 0,
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4.0),
-            child: SfCalendar(
-                view: CalendarView.month,
-                firstDayOfWeek: 1,
-                initialSelectedDate: DateTime.now(),
-                todayHighlightColor: Colors.lightBlueAccent,
-                showNavigationArrow: true,
-                dataSource: events,
-              ),
+      body: 
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+          child: SfCalendar(
+            view: CalendarView.month,
+            firstDayOfWeek: 1,
+            initialSelectedDate: DateTime.now(),
+            todayHighlightColor: Colors.lightBlueAccent,
+            showNavigationArrow: true,
+            dataSource: events,
+            monthViewSettings: const MonthViewSettings(
+              showAgenda: true,
+            ),
           ),
-        ],
-      ), 
+        ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.lightBlueAccent,
         onPressed: () {
           Navigator.push(
             context, 
             MaterialPageRoute(builder: (context) => const EventAddScreen()),
-          );
+          ).then((value) {
+            setState(() {});
+          });
         },
-      child: const Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
       drawer: defaultDrawer(context: context),
     );
