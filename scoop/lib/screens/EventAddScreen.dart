@@ -100,8 +100,9 @@ class _EventAddState extends State<EventAddScreen>{
                     DatePicker.showTimePicker(
                       context,
                       showTitleActions: true,
-                      currentTime: DateTime.now(),
                       locale: LocaleType.ko,
+                      showSecondsColumn: false,
+                      currentTime: DateTime(0, 0, 0, 12, 0),
                       onConfirm: (time) {
                         setState(() {
                           startTime = DateFormat('HH:mm:ss').format(time).toString();
@@ -116,8 +117,9 @@ class _EventAddState extends State<EventAddScreen>{
                     DatePicker.showTimePicker(
                       context,
                       showTitleActions: true,
-                      currentTime: DateTime.now(),
                       locale: LocaleType.ko,
+                      showSecondsColumn: false,
+                      currentTime: DateTime(0, 0, 0, 12, 0),
                       onConfirm: (time) {
                         setState(() {
                           endTime = DateFormat('HH:mm:ss').format(time).toString();

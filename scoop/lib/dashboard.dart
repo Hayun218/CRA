@@ -39,7 +39,7 @@ class _DashboardState extends State<DashboardPage> {
            .catchError((error) => print("문제가 발생했습니다"));                
   }
 
-  void calendarTapped (CalendarTapDetails details) {
+  void calendarPressed (CalendarLongPressDetails details) {
     final Meeting appointmentDetails = details.appointments![0];
 
     docId = appointmentDetails.id;
@@ -48,7 +48,7 @@ class _DashboardState extends State<DashboardPage> {
       context: context, 
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("정말 삭제하시겠습니까?"),
+          title: Text("이벤트를 삭제하시겠습니까?"),
           actions: [
             TextButton(
               child: Text("취소"),
@@ -116,7 +116,7 @@ class _DashboardState extends State<DashboardPage> {
             monthViewSettings: const MonthViewSettings(
               showAgenda: true,
             ),
-            onTap: calendarTapped,
+            onLongPress: calendarPressed,
           ),
         ),
       floatingActionButton: FloatingActionButton(
@@ -126,7 +126,7 @@ class _DashboardState extends State<DashboardPage> {
             context, 
             MaterialPageRoute(builder: (context) => const EventAddScreen()),
           ).then((value) {
-            setState(() {});
+            getDataFromFireStore();
           });
         },
         child: const Icon(Icons.add),
