@@ -56,7 +56,27 @@ class _PhotoState extends State<PhotoPage> {
                 return ListTile(
                   title: Text(data['title']),
                   subtitle: Text(data['date']),
-                  onTap: () => launch(data['link']),
+                  onTap: () => showDialog(
+                    context: context, 
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text("외부 페이지로 이동합니다"),
+                        actions: [
+                          TextButton(
+                            child: Text("취소"),
+                            onPressed: () => Navigator.pop(context),
+                          ),
+                          TextButton(
+                            child: Text("이동"),
+                            onPressed: () {
+                              launch(data['link']);
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  ),
                   trailing: 
                   Row(
                     mainAxisSize: MainAxisSize.min,

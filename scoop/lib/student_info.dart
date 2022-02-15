@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:scoop/screens/StudentAddScreen.dart';
@@ -16,13 +14,20 @@ class StudentInfoPage extends StatefulWidget {
 class _StudentInfoState extends State<StudentInfoPage> {
   CollectionReference studentInfo = FirebaseFirestore.instance.collection('students');
   String orderQuery = 'name';
-  String searchValue = '';
+  String query = '';
 
   Future<void> deleteStudent(String id) async {
     return studentInfo
            .doc(id).delete()
            .then((value) => print("삭제되었습니다"))
            .catchError((error) => print("문제가 발생했습니다"));                
+  }
+
+  final controller = TextEditingController();
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -42,19 +47,71 @@ class _StudentInfoState extends State<StudentInfoPage> {
       ),
       body: 
         StreamBuilder<QuerySnapshot>(
-        stream: studentInfo.snapshots(),
+        stream: (controller.text != '' && controller.text != null)?
+          studentInfo.where(orderQuery, isEqualTo: query).snapshots():
+          studentInfo.orderBy(orderQuery).snapshots(),
         builder: 
           (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.hasError) {
-              return const Text('Error Ocurred');
+              return const Center(child: Text('Error Ocurred'));
             }
 
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Text("Loading ...");
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (!snapshot.hasData) {
+              return const Center(child: Text('일치하는 학생이 없습니다'),);
             }
           
             return Column(
               children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    Expanded(child: 
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        child: TextField(
+                          controller: controller,
+                          decoration: InputDecoration(
+                            isDense: true,
+                            focusColor: Colors.lightBlueAccent,
+                            prefixIcon: Icon(Icons.search, color: Colors.black,),
+                            border: OutlineInputBorder(),
+                            suffixIcon: IconButton(
+                              icon: Icon(Icons.clear, color: controller.text.isNotEmpty ? Colors.black : Colors.transparent,),
+                              onPressed: () {
+                                setState(() {
+                                  query = '';
+                                });
+                                controller.clear();
+                              },
+                            ),
+                          ),
+                        ), 
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            query = controller.text;
+                          });
+                        }, 
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.lightBlueAccent,
+                        ),
+                        child: const Text(
+                          '찾기',
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
                 DropdownButton<String>(
                   value: orderQuery,
                   icon: const Icon(Icons.arrow_downward),
@@ -88,8 +145,8 @@ class _StudentInfoState extends State<StudentInfoPage> {
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          IconButton(onPressed: null, icon: const Icon(Icons.edit), color: Colors.transparent,),
-                          IconButton(onPressed: null, icon: const Icon(Icons.edit), color: Colors.transparent,),
+                          IconButton(onPressed: null, icon: const Icon(Icons.edit), color: Colors.white,),
+                          IconButton(onPressed: null, icon: const Icon(Icons.delete), color: Colors.white,),
                         ],
                       )
                     ],
