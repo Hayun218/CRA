@@ -50,6 +50,8 @@ dependencies:
   file_picker: ^4.3.3
   firebase_storage: ^10.2.6
   firestore_search: ^0.1.9
+  firebase_helpers: ^0.5.0
+  syncfusion_flutter_calendar: ^19.4.50
 
 
 dev_dependencies:

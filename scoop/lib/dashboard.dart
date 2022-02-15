@@ -1,7 +1,12 @@
+import 'dart:math';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:intl/intl.dart';
 import 'package:scoop/screens/Drawer.dart';
-import 'package:table_calendar/table_calendar.dart';
-import 'event.dart';
+import 'package:scoop/screens/EventAddScreen.dart';
+import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({Key? key}) : super(key: key);
@@ -11,27 +16,40 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardState extends State<DashboardPage> {
-  Map<DateTime, List<Event>>? selectedEvents;
-  DateTime selectedDay = DateTime.now();
-  DateTime focusedDay = DateTime.now();
-
-  final TextEditingController _eventController = TextEditingController();
-
-  @override
-  void initState() {
-    selectedEvents = {};
-    super.initState();
-  }
-
-  List<Event> _getEventsfromDay(DateTime date) {
-    return selectedEvents?[date] ?? [];
-  }
+  final List<Color> _colorCollection = <Color>[];
+  MeetingDataSource? events;
+  final List<String> options = <String>['Add', 'Delete', 'Update'];
+  final databaseReference = FirebaseFirestore.instance;
 
   @override
-  void dispose() {
-    _eventController.dispose();
-    super.dispose();
-  }
+void initState() {
+  _initializeEventColor();
+  getDataFromFireStore().then((results) {
+    SchedulerBinding.instance!.addPostFrameCallback((timeStamp) {
+      setState(() {});
+    });
+  });
+  super.initState();
+}
+
+Future<void> getDataFromFireStore() async {
+  var snapShotsValue = await databaseReference
+  .collection("events")
+  .get();
+
+  final Random random = new Random();
+  List<Meeting> list = snapShotsValue.docs
+  .map((e) => Meeting(
+  eventName: e.data()['Subject'],
+  from:  DateFormat('dd/MM/yyyy HH:mm:ss').parse(e.data()['StartTime']),
+  to: DateFormat('dd/MM/yyyy HH:mm:ss').parse(e.data()['EndTime']),
+  background: _colorCollection[random.nextInt(9)],
+  isAllDay: false))
+  .toList();
+    setState(() {
+  events = MeetingDataSource(list);
+  });
+}
 
   @override
   Widget build(BuildContext context) {
@@ -43,122 +61,91 @@ class _DashboardState extends State<DashboardPage> {
         ),
         centerTitle: true,
         title: const Text(
-          "Dashboard",
+          "일정",
           style: TextStyle(color: Colors.black, fontSize: 17, fontWeight: FontWeight.w700)),
         backgroundColor: Colors.white,
         elevation: 0,
       ),
       body: Column(
         children: [
-          TableCalendar(
-            focusedDay: selectedDay,
-            firstDay: DateTime(DateTime.now().year - 1, DateTime.now().month, DateTime.now().day),
-            lastDay: DateTime(DateTime.now().year + 1, DateTime.now().month, DateTime.now().day),
-            startingDayOfWeek: StartingDayOfWeek.monday,
-            daysOfWeekVisible: true,
-
-            //Day Changed
-            onDaySelected: (DateTime selectDay, DateTime focusDay) {
-              setState(() {
-                selectedDay = selectDay;
-                focusedDay = focusDay;
-              });
-              print(focusedDay);
-            },
-            selectedDayPredicate: (DateTime date) {
-              return isSameDay(selectedDay, date);
-            },
-
-            eventLoader: _getEventsfromDay,
-
-            //To style the Calendar
-            calendarStyle: CalendarStyle(
-              isTodayHighlighted: true,
-              selectedDecoration: BoxDecoration(
-                color: Colors.lightBlueAccent,
-                shape: BoxShape.rectangle,
-                borderRadius: BorderRadius.circular(5.0),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+            child: SfCalendar(
+                view: CalendarView.month,
+                firstDayOfWeek: 1,
+                initialSelectedDate: DateTime.now(),
+                todayHighlightColor: Colors.lightBlueAccent,
+                showNavigationArrow: true,
+                dataSource: events,
               ),
-              selectedTextStyle: TextStyle(color: Colors.white),
-              todayDecoration: BoxDecoration(
-                color: Colors.grey[300],
-                shape: BoxShape.rectangle,
-                borderRadius: BorderRadius.circular(5.0),
-              ),
-              defaultDecoration: BoxDecoration(
-                shape: BoxShape.rectangle,
-                borderRadius: BorderRadius.circular(5.0),
-              ),
-              weekendDecoration: BoxDecoration(
-                shape: BoxShape.rectangle,
-                borderRadius: BorderRadius.circular(5.0),
-              ),
-            ),
-            headerStyle: HeaderStyle(
-              formatButtonVisible: false,
-              titleCentered: true,
-              formatButtonShowsNext: false,
-              formatButtonDecoration: BoxDecoration(
-                color: Colors.blue,
-                borderRadius: BorderRadius.circular(5.0),
-              ),
-              formatButtonTextStyle: TextStyle(
-                color: Colors.white,
-              ),
-            ),
-          ),
-          ..._getEventsfromDay(selectedDay).map(
-            (Event event) => ListTile(
-              title: Text(
-                event.title,
-              ),
-            ),
           ),
         ],
-      ),
+      ), 
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.lightBlueAccent,
-        onPressed: () => showDialog(
-          context: context, 
-          builder: (context) => AlertDialog(
-            title: Text("Add Event"),
-            content: TextFormField(
-              controller: _eventController,
-            ),
-            actions: [
-              TextButton(
-                child: Text("Cancel"),
-                onPressed: () => Navigator.pop(context),
-              ),
-              TextButton(
-                child: Text("Ok"),
-                onPressed: () {
-                  if (_eventController.text.isEmpty) {
-
-                  } else {
-                    if (selectedEvents?[selectedDay] != null) {
-                      selectedEvents?[selectedDay]?.add(
-                        Event(title: _eventController.text),
-                      );
-                    } else {
-                      selectedEvents?[selectedDay] = [
-                        Event(title: _eventController.text)
-                      ];
-                    }
-
-                  }
-                  Navigator.pop(context);
-                  _eventController.clear();
-                  setState((){});
-                  return;
-                },
-              ),
-            ],
-          ),
-        ),
+        onPressed: () {
+          Navigator.push(
+            context, 
+            MaterialPageRoute(builder: (context) => const EventAddScreen()),
+          );
+        },
       child: const Icon(Icons.add),
       ),
       drawer: defaultDrawer(context: context),
     );
   }
+
+  void _initializeEventColor() {
+    _colorCollection.add(const Color(0xFF0F8644));
+    _colorCollection.add(const Color(0xFF8B1FA9));
+    _colorCollection.add(const Color(0xFFD20100));
+    _colorCollection.add(const Color(0xFFFC571D));
+    _colorCollection.add(const Color(0xFF36B37B));
+    _colorCollection.add(const Color(0xFF01A1EF));
+    _colorCollection.add(const Color(0xFF3D4FB5));
+    _colorCollection.add(const Color(0xFFE47C73));
+    _colorCollection.add(const Color(0xFF636363));
+    _colorCollection.add(const Color(0xFF0A8043));
+  }
+}
+
+class MeetingDataSource extends CalendarDataSource {
+  MeetingDataSource(List<Meeting> source) {
+    appointments = source;
+  }
+
+  @override
+  DateTime getStartTime(int index) {
+    return appointments![index].from;
+  }
+
+  @override
+  DateTime getEndTime(int index) {
+    return appointments![index].to;
+  }
+
+  @override
+  bool isAllDay(int index) {
+    return appointments![index].isAllDay;
+  }
+
+  @override
+  String getSubject(int index) {
+    return appointments![index].eventName;
+  }
+
+  @override
+  Color getColor(int index) {
+    return appointments![index].background;
+  }
+}
+
+class Meeting {
+  String? eventName;
+  DateTime? from;
+  DateTime? to;
+  Color? background;
+  bool? isAllDay;
+
+  Meeting({this.eventName, this.from, this.to, this.background, this.isAllDay});
 }
