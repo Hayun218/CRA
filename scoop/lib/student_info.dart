@@ -48,7 +48,9 @@ class _StudentInfoState extends State<StudentInfoPage> {
       body: 
         StreamBuilder<QuerySnapshot>(
         stream: (controller.text != '' && controller.text != null)?
-          studentInfo.where(orderQuery, isEqualTo: query).snapshots():
+          studentInfo.where(orderQuery, isGreaterThanOrEqualTo: query)
+          .where(orderQuery, isLessThan: query.substring(0, query.length-1)+String.fromCharCode(query.codeUnitAt(query.length-1)+1))
+          .snapshots():
           studentInfo.orderBy(orderQuery).snapshots(),
         builder: 
           (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
