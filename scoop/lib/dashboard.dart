@@ -19,6 +19,7 @@ class _DashboardState extends State<DashboardPage> {
   final List<Color> _colorCollection = <Color>[];
   MeetingDataSource? events;
   final databaseReference = FirebaseFirestore.instance;
+  String? docId = '';
 
   @override
   void initState() {
@@ -29,6 +30,41 @@ class _DashboardState extends State<DashboardPage> {
       });
     });
     super.initState();
+  }
+
+  Future<void> deleteEvent(String id) async {
+    return databaseReference.collection('events')
+           .doc(id).delete()
+           .then((value) => print("삭제되었습니다"))
+           .catchError((error) => print("문제가 발생했습니다"));                
+  }
+
+  void calendarTapped (CalendarTapDetails details) {
+    final Meeting appointmentDetails = details.appointments![0];
+
+    docId = appointmentDetails.id;
+
+    showDialog(
+      context: context, 
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("정말 삭제하시겠습니까?"),
+          actions: [
+            TextButton(
+              child: Text("취소"),
+              onPressed: () => Navigator.pop(context),
+            ),
+            TextButton(
+              child: Text("삭제"),
+              onPressed: () {
+                deleteEvent(docId!);
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      }
+    );
   }
 
   Future<void> getDataFromFireStore() async {
@@ -43,6 +79,7 @@ class _DashboardState extends State<DashboardPage> {
       from: DateFormat('dd/MM/yyyy HH:mm:ss').parse(e.data()['startTime']),
       to: DateFormat('dd/MM/yyyy HH:mm:ss').parse(e.data()['endTime']),
       background: _colorCollection[random.nextInt(9)],
+      id: e.id,
       isAllDay: false)
     )
     .toList();
@@ -79,6 +116,7 @@ class _DashboardState extends State<DashboardPage> {
             monthViewSettings: const MonthViewSettings(
               showAgenda: true,
             ),
+            onTap: calendarTapped,
           ),
         ),
       floatingActionButton: FloatingActionButton(
@@ -148,6 +186,7 @@ class Meeting {
   DateTime? to;
   Color? background;
   bool? isAllDay;
+  String id;
 
-  Meeting({this.eventName, this.from, this.to, this.background, this.isAllDay});
+  Meeting({this.eventName, this.from, this.to, this.background, this.isAllDay, required this.id});
 }

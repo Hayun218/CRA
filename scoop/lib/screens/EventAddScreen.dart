@@ -129,7 +129,8 @@ class _EventAddState extends State<EventAddScreen>{
                 ),
               ],
             ),
-            Text('선택된 날짜: $displayDate 시간: $startTime - $endTime'),
+            Text('선택된 날짜: $displayDate'),
+            Text('선택된 시간: $startTime - $endTime'),
             Container(height: 30.0,),
             ElevatedButton(
               onPressed: () async {
