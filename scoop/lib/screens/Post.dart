@@ -100,7 +100,7 @@ class _PostState extends State<Post> {
               child: Text(widget.data['content']),
             ),
           ] else ...[
-            Image.network(widget.data['link'], fit: BoxFit.fitWidth,),
+            Image.network(widget.data['link'], fit: BoxFit.fill,),
             const SizedBox(height: 10,),
             SizedBox(
               width: 370,
@@ -112,8 +112,28 @@ class _PostState extends State<Post> {
               Text('첨부파일', style: TextStyle(fontWeight: FontWeight.bold)),
             ],),
             ListTile(
-              title: widget.data['filename'],
-              onTap: () => launch(widget.data['link']),
+              title: Text(widget.data['filename']),
+              onTap: () => showDialog(
+                context: context, 
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: Text("파일을 다운로드합니다"),
+                    actions: [
+                      TextButton(
+                        child: Text("취소"),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                      TextButton(
+                        child: Text("이동"),
+                        onPressed: () {
+                          launch(widget.data['link']);
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ],
+                  );
+                },
+              ),
             ),
           ],
         ],

@@ -12,7 +12,7 @@ class Notice extends StatefulWidget {
 }
 
 class _NoticeState extends State<Notice> {
-  Query<Map<String, dynamic>> post = FirebaseFirestore.instance.collection('notice').orderBy('date', descending: true);
+  Query<Map<String, dynamic>> post = FirebaseFirestore.instance.collection('notice');
 
   String category = '공지';
   String query = '';
@@ -42,8 +42,13 @@ class _NoticeState extends State<Notice> {
       body: 
         StreamBuilder<QuerySnapshot>(
         stream: (controller.text != '' && controller.text != null)?
-          post.where('category', isEqualTo: category).where('title', isEqualTo: query).snapshots():
-          post.where('category', isEqualTo: category).snapshots(),
+          post.where('category', isEqualTo: category)
+          .where('title', isGreaterThanOrEqualTo: query)
+          .where('title', isLessThan: query.substring(0, query.length-1)+String.fromCharCode(query.codeUnitAt(query.length-1)+1))
+          .orderBy('title')
+          .orderBy('date', descending: true)
+          .snapshots():
+          post.orderBy('date', descending: true).where('category', isEqualTo: category).snapshots(),
         builder: 
           (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.hasError) {

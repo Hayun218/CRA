@@ -182,7 +182,7 @@ class _PostEditState extends State<PostEditScreen>{
               },
             ),
             const SizedBox(height: 8,),
-            (fileName != '파일 없음' && widget.data['filename'] != null)?
+            (fileName == '파일 없음' && widget.data['filename'] != null)?
               Text(widget.data['filename'], style: const TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold)):
               Text(fileName, style: const TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold)),
             Container(height: 30.0,),
