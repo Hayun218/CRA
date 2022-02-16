@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:scoop/notification.dart';
 import 'package:scoop/student_info.dart';
@@ -17,8 +18,8 @@ defaultDrawer({
             ),
             ListTile(
               title: const Text('로그아웃'),
-              onTap: () {
-                Navigator.pop(context);
+              onTap: () async {
+                await FirebaseAuth.instance.signOut();
               },
             ),
             ListTile(
