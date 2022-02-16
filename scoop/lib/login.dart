@@ -38,6 +38,8 @@ class Authentication extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final User? user = FirebaseAuth.instance.currentUser;
+
     return StreamBuilder(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
@@ -56,7 +58,21 @@ class Authentication extends StatelessWidget {
             ],
           );
         }
-        return Scaffold();
+        return Scaffold(
+          body: 
+          Center(
+            child: Column(children: [
+              Text(user!.uid),
+              TextButton(
+              onPressed: () async {
+                await FirebaseAuth.instance.signOut();
+              },
+              child: Text('로그아웃', style: TextStyle(color: Colors.black),),
+            ),
+            ],),
+            
+          ), 
+        );
       },
     );
   }

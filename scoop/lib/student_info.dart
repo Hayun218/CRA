@@ -50,6 +50,7 @@ class _StudentInfoState extends State<StudentInfoPage> {
         stream: (controller.text != '' && controller.text != null)?
           studentInfo.where(orderQuery, isGreaterThanOrEqualTo: query)
           .where(orderQuery, isLessThan: query.substring(0, query.length-1)+String.fromCharCode(query.codeUnitAt(query.length-1)+1))
+          .orderBy(orderQuery)
           .snapshots():
           studentInfo.orderBy(orderQuery).snapshots(),
         builder: 
@@ -144,13 +145,7 @@ class _StudentInfoState extends State<StudentInfoPage> {
                       listTitle(text: "이름"),
                       listTitle(text: "생년월일"),
                       listTitle(text: "담당코치"),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(onPressed: null, icon: const Icon(Icons.edit), color: Colors.white,),
-                          IconButton(onPressed: null, icon: const Icon(Icons.delete), color: Colors.white,),
-                        ],
-                      )
+                      SizedBox(width: 110,),
                     ],
                   ),
                 ),

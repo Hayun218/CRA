@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:scoop/dashboard.dart';
+import 'package:scoop/login.dart';
 import 'page_view.dart';
 
 import 'first_screen.dart';
@@ -13,7 +14,7 @@ class Scoop extends StatelessWidget {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Scoop',
-      home: Pages(),
+      home: LoginPage(),
       //home: FirstScreen(),
     );
   }
