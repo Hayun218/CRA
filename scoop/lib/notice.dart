@@ -17,6 +17,9 @@ class _NoticeState extends State<Notice> {
   String category = '공지';
   String query = '';
 
+  String messageTitle = "Empty";
+  String notificationAlert = "alert";
+
   final controller = TextEditingController();
   @override
   void dispose() {

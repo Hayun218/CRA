@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:scoop/notification.dart';
 import 'package:scoop/student_info.dart';
 
 defaultDrawer({
@@ -23,7 +24,10 @@ defaultDrawer({
             ListTile(
               title: const Text('알림설정'),
               onTap: () {
-                Navigator.pop(context);
+                Navigator.push(
+                  context, 
+                  MaterialPageRoute(builder: (context) => const NotiPage()),
+                );
               },
             ),
             ListTile(
