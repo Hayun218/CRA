@@ -6,15 +6,16 @@ import 'package:scoop/student_info.dart';
 defaultDrawer({
   required BuildContext context,
 }) {
+  final User? user = FirebaseAuth.instance.currentUser;
   return Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            const DrawerHeader(
+            DrawerHeader(
               decoration: BoxDecoration(
                 color: Colors.lightBlueAccent,
               ),
-              child: Text('XXX님'),
+              child: Text(user!.uid),
             ),
             ListTile(
               title: const Text('로그아웃'),

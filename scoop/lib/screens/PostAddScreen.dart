@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -18,12 +19,13 @@ class PostAddScreen extends StatefulWidget {
 class _PostAddState extends State<PostAddScreen>{
   final formKey = GlobalKey<FormState>();
   CollectionReference studentInfo = FirebaseFirestore.instance.collection('notice');
+  final User? user = FirebaseAuth.instance.currentUser;
 
   Future<void> addPost(String urlDownload, String fileName) async {
     return studentInfo.add({
       'title': title, //포스트 제목
       'date': DateFormat.yMd().format(DateTime.now()).toString(), //생성 시간 
-      'author': coach, //현재 유저 (user?.uid)
+      'author': user!.displayName, //현재 유저 (user?.uid)
       'content': content, //포스트 내용
       'category': category, //카테고리 
       'link': urlDownload,
@@ -36,7 +38,7 @@ class _PostAddState extends State<PostAddScreen>{
     return studentInfo.add({
       'title': title, //포스트 제목
       'date': DateFormat.yMd().format(DateTime.now()).toString(), //생성 시간 
-      'author': coach, //현재 유저 (user?.uid)
+      'author': user!.displayName, //현재 유저 (user?.uid)
       'content': content, //포스트 내용
       'category': category, //카테고리 
       'link': '',

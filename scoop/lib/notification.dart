@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,7 @@ class _NotiPageState extends State<NotiPage> {
   String notificationTitle = 'No Title';
   String notificationBody = 'No Body';
   String notificationData = 'No Data';
+  final User? user = FirebaseAuth.instance.currentUser;
 
   void getToken () async {
     String? token = await FirebaseMessaging.instance.getToken();
@@ -59,6 +61,12 @@ class _NotiPageState extends State<NotiPage> {
             TextButton(
               onPressed: getToken, 
               child: Text('Get Token', style: TextStyle(color: Colors.black),),
+            ),
+            TextButton(
+              onPressed: () {
+                user!.updateDisplayName('김형진');
+              }, 
+              child: Text('버튼', style: TextStyle(color: Colors.black),),
             ),
           ],
         ),
