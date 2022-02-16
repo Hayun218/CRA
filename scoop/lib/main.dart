@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 import 'app.dart';
 import 'page_view_state.dart';
 import 'auth.dart';
+import 'login.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
