@@ -39,7 +39,8 @@ class _PostState extends State<Post> {
       ),
       body:
       // 제목 아래 작게 날짜, 글쓴이. 그 옆에는 수정&삭제 아이콘. 아래는 얇은 선으로 구분하고 사진or파일링크, 내용.  
-      Column(
+      SingleChildScrollView(
+        child: Column(
         children: [
           Text(
             widget.data['title'],
@@ -137,7 +138,8 @@ class _PostState extends State<Post> {
             ),
           ],
         ],
-      ), 
+      ),
+      ),
     );
   }
 }

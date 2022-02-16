@@ -14,8 +14,8 @@ class Scoop extends StatelessWidget {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Scoop',
-      home: LoginPage(),
-      //home: FirstScreen(),
+      //home: LoginPage(),
+      home: FirstScreen(),
     );
   }
 }

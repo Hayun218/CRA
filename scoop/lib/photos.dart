@@ -39,7 +39,7 @@ class _PhotoState extends State<PhotoPage> {
       ),
       body: 
         StreamBuilder<QuerySnapshot>(
-        stream: photo.orderBy('date').snapshots(),
+        stream: photo.orderBy('date', descending: true).snapshots(),
         builder: 
           (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.hasError) {

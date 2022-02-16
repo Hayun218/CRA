@@ -51,7 +51,7 @@ class _NoticeState extends State<Notice> {
           .orderBy('title')
           .orderBy('date', descending: true)
           .snapshots():
-          post.orderBy('date', descending: true).where('category', isEqualTo: category).snapshots(),
+          post.where('category', isEqualTo: category).orderBy('date', descending: true).snapshots(),
         builder: 
           (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.hasError) {
